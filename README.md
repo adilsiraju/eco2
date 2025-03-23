@@ -1,4 +1,4 @@
-# Ecovest: Sustainable Investing Platform
+# The Sustainable Investing Platform
 
 ![image](https://github.com/user-attachments/assets/4476700f-8d9e-4750-9f17-287efabffb51)
 
