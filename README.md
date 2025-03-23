@@ -19,7 +19,9 @@ Investment Options
 *   **Initiatives**: Projects focused on sustainability, such as renewable energy, water conservation, and recycling, offering measurable environmental benefits.
     
 *   **Startup Companies**: Innovative green technology and sustainability-focused firms, providing investors a chance to back emerging leaders in the eco-space.
-    
+
+![Uploading image.png…]()
+
 ![image](https://github.com/user-attachments/assets/6b024469-906f-40a9-bb57-3224ecceb921)
 
 Key Features
