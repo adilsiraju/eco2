@@ -12,6 +12,7 @@ Mission
 -------
 *   **Mission**: To make sustainable investing accessible, impactful, and profitable for everyone, proving that financial returns and planetary good can coexist.
     
+![image](https://github.com/user-attachments/assets/6b024469-906f-40a9-bb57-3224ecceb921)
 
 Investment Options
 ------------------
@@ -21,9 +22,6 @@ Investment Options
 *   **Startup Companies**: Innovative green technology and sustainability-focused firms, providing investors a chance to back emerging leaders in the eco-space.
 
 ![image](https://github.com/user-attachments/assets/de398c85-f9c4-4242-bfa0-a564d8850da9)
-
-
-![image](https://github.com/user-attachments/assets/6b024469-906f-40a9-bb57-3224ecceb921)
 
 Key Features
 ------------
