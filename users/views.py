@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, UserProfileForm
 from django.db.models import Sum
+from investments.models import Investment
 
 def register(request):
     if request.method == 'POST':
@@ -17,18 +18,28 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    # Calculate totals from investments
-    totals = request.user.investments.aggregate(
-        carbon_reduced_total=Sum('carbon_reduced'),
-        energy_saved_total=Sum('energy_saved'),
-        water_conserved_total=Sum('water_conserved')
-    )
-    
+    # Fetch user's investments
+    investments = Investment.objects.filter(user=request.user)
+
+    # Separate initiative and company investments
+    initiative_investments = investments.filter(initiative__isnull=False)
+    company_investments = investments.filter(company__isnull=False)
+
+    # Calculate totals
+    total_invested = sum(inv.amount for inv in investments)
+    total_carbon_reduced = sum(inv.carbon_reduced for inv in investments)
+    total_energy_saved = sum(inv.energy_saved for inv in investments)
+    total_water_conserved = sum(inv.water_conserved for inv in investments)
+    total_holdings = investments.count()
+
     context = {
-        'user': request.user,
-        'carbon_reduced_total': totals['carbon_reduced_total'] or 0,
-        'energy_saved_total': totals['energy_saved_total'] or 0,
-        'water_conserved_total': totals['water_conserved_total'] or 0,
+        'initiative_investments': initiative_investments,
+        'company_investments': company_investments,
+        'total_invested': total_invested,
+        'total_carbon_reduced': total_carbon_reduced,
+        'total_energy_saved': total_energy_saved,
+        'total_water_conserved': total_water_conserved,
+        'total_holdings': total_holdings,
     }
     return render(request, 'users/dashboard.html', context)
 
