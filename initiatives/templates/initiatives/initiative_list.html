@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+{% block title %}Initiatives{% endblock %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-12 text-center">
+                <h2 class="fw-bold">Browse Initiatives</h2>
+                <p class="lead text-muted">Discover high-impact opportunities waiting for your investment</p>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="categoryFilter" class="form-label">Filter by Category:</label>
+            <select id="categoryFilter" class="form-select w-auto d-inline-block" onchange="window.location.href=this.value">
+                <option value="{% url 'initiative_list' %}">All</option>
+                {% for category in categories %}
+                    <option value="{% url 'initiative_list' %}?category={{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="row">
+            {% for initiative in initiatives %}
+                <div class="col-md-4 mb-4">
+                    <div class="card project-card h-100">
+                        {% if initiative.image %}
+                            <img src="{{ initiative.image.url }}" class="card-img-top" alt="{{ initiative.title }}">
+                        {% else %}
+                            <img src="https://source.unsplash.com/random/600x400/?sustainability" class="card-img-top" alt="{{ initiative.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">{{ initiative.category.name }}</span>
+                            <h4 class="card-title">{{ initiative.title }}</h4>
+                            <p class="card-text">{{ initiative.description|truncatewords:20 }}</p>
+                            <p class="card-text text-muted">
+                                <small>
+                                    Location: <span class="badge bg-secondary">{{ initiative.location }}</span> | 
+                                    Tech: <span class="badge bg-info">{{ initiative.technology_type }}</span>
+                                </small>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success fw-bold">
+                                    {% widthratio initiative.current_amount initiative.goal_amount 100|floatformat:0 %}% Funded
+                                </span>
+                                <span class="text-muted">Target: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <a href="{% url 'initiative_detail' initiative.id %}" class="btn btn-primary w-100">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No initiatives available at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

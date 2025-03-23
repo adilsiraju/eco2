@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="mb-5 text-center">Your Dashboard</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card impact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-cloud impact-icon mb-4"></i>
+                        <h3>Carbon Reduced</h3>
+                        <div class="bg-light p-3 rounded mt-3">
+                            <h4 class="mb-0">Total</h4>
+                            <p class="display-6 fw-bold text-success mb-0">
+                                {{ carbon_reduced_total|floatformat:2 }} kg
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card impact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-bolt impact-icon mb-4"></i>
+                        <h3>Energy Saved</h3>
+                        <div class="bg-light p-3 rounded mt-3">
+                            <h4 class="mb-0">Total</h4>
+                            <p class="display-6 fw-bold text-success mb-0">
+                                {{ energy_saved_total|floatformat:2 }} kWh
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card impact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-tint impact-icon mb-4"></i>
+                        <h3>Water Conserved</h3>
+                        <div class="bg-light p-3 rounded mt-3">
+                            <h4 class="mb-0">Total</h4>
+                            <p class="display-6 fw-bold text-success mb-0">
+                                {{ water_conserved_total|floatformat:2 }} L
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3 class="mt-5">Your Investments</h3>
+        {% if user.investments.all %}
+            <div class="row">
+                {% for investment in user.investments.all %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card project-card h-100">
+                            <div class="card-body">
+                                <span class="badge bg-primary mb-2">{{ investment.initiative.category.name }}</span>
+                                <h4 class="card-title">{{ investment.initiative.title }}</h4>
+                                <p class="card-text">Invested: ₹{{ investment.amount|floatformat:2 }}</p>
+                                <p class="card-text text-muted">
+                                    <small>Location: {{ investment.initiative.location }} | Tech: {{ investment.initiative.technology_type }}</small>
+                                </p>
+                                <p class="card-text">Date: {{ investment.created_at|date:"F d, Y" }}</p>
+                                <a href="{% url 'initiative_detail' investment.initiative.id %}" class="btn btn-outline-primary w-100">View Project</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">You haven't made any investments yet. <a href="{% url 'initiative_list' %}">Browse initiatives</a> to get started!</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

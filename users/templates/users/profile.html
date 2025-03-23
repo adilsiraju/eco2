@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% load django_bootstrap5 %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-center mb-4">Your Profile</h2>
+                        <div class="text-center mb-4">
+                            {% if user.profile.profile_image %}
+                                <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3" width="100" alt="Profile Image">
+                            {% else %}
+                                <p>No profile image set.</p>
+                            {% endif %}
+                        </div>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

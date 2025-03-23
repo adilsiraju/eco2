@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ initiative.title }}{% endblock %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="card-title">{{ initiative.title }}</h2>
+                        <p class="text-muted mb-4">
+                            {{ initiative.category.name }} | {{ initiative.status|title }} | 
+                            Location: {{ initiative.location }} | Tech: {{ initiative.technology_type }}
+                        </p>
+                        {% if initiative.image %}
+                            <img src="{{ initiative.image.url }}" class="img-fluid mb-4 rounded" alt="{{ initiative.title }}">
+                        {% else %}
+                            <img src="https://source.unsplash.com/random/800x400/?sustainability" class="img-fluid mb-4 rounded" alt="{{ initiative.title }}">
+                        {% endif %}
+                        <p>{{ initiative.description }}</p>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <p>Raised: ₹{{ initiative.current_amount|floatformat:2 }} of ₹{{ initiative.goal_amount|floatformat:2 }}</p>
+                        <p>Duration: {{ initiative.duration_months }} months | Scale: {{ initiative.project_scale }}</p>
+                        <p>Created: {{ initiative.created_at|date:"F d, Y" }}</p>
+                        {% if user.is_authenticated and initiative.status == 'active' %}
+                            <a href="{% url 'invest' initiative.id %}" class="btn btn-primary">Invest Now</a>
+                        {% elif not user.is_authenticated %}
+                            <p><a href="{% url 'login' %}">Login</a> to invest in this initiative.</p>
+                        {% else %}
+                            <p class="text-muted">This initiative is {{ initiative.status }}.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -116,6 +116,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+CURRENCY = 'INR'  # Indian Rupees
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -131,3 +133,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+LOGIN_REDIRECT_URL = '/users/dashboard/'  # Redirect to dashboard after login
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # Redirect to login page after logout (optional)
+LOGIN_URL = '/accounts/login/'           # Ensure login URL is explicit (optional)
