@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load investment_tags %}
 {% block title %}Your Dashboard - Ecovest{% endblock %}
 {% block content %}
 <!-- Header Section -->
@@ -87,23 +88,25 @@
                     <div class="col-md-6 mb-4">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
-                                <h5 class="card-title">{{ investment.initiative.title }}</h5>
+                                <h5 class="card-title">{{ investment.initiative__title }}</h5>
                                 <p class="text-muted">
-                                    {% for category in investment.initiative.categories.all %}
-                                        <span class="badge bg-primary me-1">{{ category.name }}</span>
-                                    {% endfor %}
+                                    {% with initiative=investment.initiative__id|lookup:initiatives %}
+                                        {% for category in initiative.categories.all %}
+                                            <span class="badge bg-primary me-1">{{ category.name }}</span>
+                                        {% endfor %}
+                                    {% endwith %}
                                 </p>
                                 <div class="row">
                                     <div class="col-6">
-                                        <p><strong>Amount Invested:</strong> ₹{{ investment.amount|floatformat:2 }}</p>
-                                        <p><strong>Carbon Reduced:</strong> {{ investment.carbon_reduced|floatformat:0 }} kg</p>
+                                        <p><strong>Amount Invested:</strong> ₹{{ investment.total_amount|floatformat:2 }}</p>
+                                        <p><strong>Carbon Reduced:</strong> {{ investment.total_carbon_reduced|floatformat:0 }} kg</p>
                                     </div>
                                     <div class="col-6">
-                                        <p><strong>Energy Saved:</strong> {{ investment.energy_saved|floatformat:0 }} kWh</p>
-                                        <p><strong>Water Conserved:</strong> {{ investment.water_conserved|floatformat:0 }} L</p>
+                                        <p><strong>Energy Saved:</strong> {{ investment.total_energy_saved|floatformat:0 }} kWh</p>
+                                        <p><strong>Water Conserved:</strong> {{ investment.total_water_conserved|floatformat:0 }} L</p>
                                     </div>
                                 </div>
-                                <a href="{% url 'initiative_detail' investment.initiative.id %}" class="btn btn-outline-primary mt-3">View Details</a>
+                                <a href="{% url 'initiative_detail' investment.initiative__id %}" class="btn btn-outline-primary mt-3">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -132,25 +135,27 @@
                     <div class="col-md-6 mb-4">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
-                                <h5 class="card-title">{{ investment.company.name }}</h5>
+                                <h5 class="card-title">{{ investment.company__name }}</h5>
                                 <p class="text-muted">
-                                    {% for category in investment.company.categories.all %}
-                                        <span class="badge bg-primary me-1">{{ category.name }}</span>
-                                    {% endfor %}
+                                    {% with company=investment.company__id|lookup:companies %}
+                                        {% for category in company.categories.all %}
+                                            <span class="badge bg-primary me-1">{{ category.name }}</span>
+                                        {% endfor %}
+                                    {% endwith %}
                                 </p>
                                 <div class="row">
                                     <div class="col-6">
-                                        <p><strong>Amount Invested:</strong> ₹{{ investment.amount|floatformat:2 }}</p>
-                                        <p><strong>Shares Owned:</strong> {{ investment.shares_purchased }}</p>
-                                        <p><strong>Carbon Reduced:</strong> {{ investment.carbon_reduced|floatformat:0 }} kg</p>
+                                        <p><strong>Amount Invested:</strong> ₹{{ investment.total_amount|floatformat:2 }}</p>
+                                        <p><strong>Shares Owned:</strong> {{ investment.total_shares }}</p>
+                                        <p><strong>Carbon Reduced:</strong> {{ investment.total_carbon_reduced|floatformat:0 }} kg</p>
                                     </div>
                                     <div class="col-6">
-                                        <p><strong>Share Price:</strong> ₹{{ investment.company.share_price|floatformat:2 }}</p>
-                                        <p><strong>Energy Saved:</strong> {{ investment.energy_saved|floatformat:0 }} kWh</p>
-                                        <p><strong>Water Conserved:</strong> {{ investment.water_conserved|floatformat:0 }} L</p>
+                                        <p><strong>Share Price:</strong> ₹{{ investment.company__share_price|floatformat:2 }}</p>
+                                        <p><strong>Energy Saved:</strong> {{ investment.total_energy_saved|floatformat:0 }} kWh</p>
+                                        <p><strong>Water Conserved:</strong> {{ investment.total_water_conserved|floatformat:0 }} L</p>
                                     </div>
                                 </div>
-                                <a href="{% url 'company_detail' investment.company.id %}" class="btn btn-outline-primary mt-3">View Details</a>
+                                <a href="{% url 'company_detail' investment.company__id %}" class="btn btn-outline-primary mt-3">View Details</a>
                             </div>
                         </div>
                     </div>

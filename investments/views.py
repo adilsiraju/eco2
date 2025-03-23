@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from initiatives.models import Initiative, Company
 from .models import Investment
 from .impact_calculator import ImpactCalculator
+from decimal import Decimal
 
 impact_calculator = ImpactCalculator()
 
@@ -10,7 +11,7 @@ impact_calculator = ImpactCalculator()
 def invest_initiative(request, initiative_id):
     initiative = get_object_or_404(Initiative, pk=initiative_id)
     if request.method == 'POST':
-        amount = float(request.POST.get('amount'))
+        amount = Decimal(request.POST.get('amount'))
         category_names = [category.name for category in initiative.categories.all()]
         carbon_reduced, energy_saved, water_conserved = impact_calculator.predict_impact(
             investment_amount=amount,
