@@ -8,3 +8,6 @@ def landing(request):
         'featured_initiatives': featured_initiatives,
         'featured_companies': featured_companies,
     })
+    
+def learn_more(request):
+    return render(request, 'core/learn_more.html')
