@@ -29,6 +29,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'initiative_list' %}">Projects</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'company_list' %}">Companies</a>
+                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>

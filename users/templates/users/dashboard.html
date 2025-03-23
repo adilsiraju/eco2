@@ -55,21 +55,36 @@
                     <div class="col-md-4 mb-4">
                         <div class="card project-card h-100">
                             <div class="card-body">
-                                <span class="badge bg-primary mb-2">{{ investment.initiative.category.name }}</span>
-                                <h4 class="card-title">{{ investment.initiative.title }}</h4>
-                                <p class="card-text">Invested: ₹{{ investment.amount|floatformat:2 }}</p>
+                                <span class="badge bg-primary mb-2">
+                                    {% if investment.initiative %}{{ investment.initiative.category.name }}
+                                    {% elif investment.company %}{{ investment.company.category.name }}
+                                    {% endif %}
+                                </span>
+                                <h4 class="card-title">
+                                    {% if investment.initiative %}{{ investment.initiative.title }}
+                                    {% elif investment.company %}{{ investment.company.name }}
+                                    {% endif %}
+                                </h4>
+                                <p class="card-text">
+                                    {% if investment.initiative %}Invested: ₹{{ investment.amount|floatformat:2 }}
+                                    {% elif investment.company %}Shares: {{ investment.shares_purchased }} (₹{{ investment.amount|floatformat:2 }})
+                                    {% endif %}
+                                </p>
                                 <p class="card-text text-muted">
-                                    <small>Location: {{ investment.initiative.location }} | Tech: {{ investment.initiative.technology_type }}</small>
+                                    <small>
+                                        Location: {% if investment.initiative %}{{ investment.initiative.location }}{% elif investment.company %}{{ investment.company.location }}{% endif %} | 
+                                        Tech: {% if investment.initiative %}{{ investment.initiative.technology_type }}{% elif investment.company %}{{ investment.company.technology_type }}{% endif %}
+                                    </small>
                                 </p>
                                 <p class="card-text">Date: {{ investment.created_at|date:"F d, Y" }}</p>
-                                <a href="{% url 'initiative_detail' investment.initiative.id %}" class="btn btn-outline-primary w-100">View Project</a>
+                                <a href="{% if investment.initiative %}{% url 'initiative_detail' investment.initiative.id %}{% elif investment.company %}{% url 'company_detail' investment.company.id %}{% endif %}" class="btn btn-outline-primary w-100">View Details</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-center">You haven't made any investments yet. <a href="{% url 'initiative_list' %}">Browse initiatives</a> to get started!</p>
+            <p class="text-center">You haven't made any investments yet. <a href="{% url 'initiative_list' %}">Browse initiatives</a> or <a href="{% url 'company_list' %}">companies</a> to get started!</p>
         {% endif %}
     </div>
 </section>
