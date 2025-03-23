@@ -71,18 +71,6 @@ class Company(models.Model):
         ('East India', 'East India'),
         ('West India', 'West India'),
     ]
-    TECHNOLOGY_CHOICES = [
-        ('Solar', 'Solar'),
-        ('Wind', 'Wind'),
-        ('Hydro', 'Hydro'),
-        ('Organic', 'Organic'),
-        ('Mechanical', 'Mechanical'),
-        ('Chemical', 'Chemical'),
-        ('Biofuel', 'Biofuel'),
-        ('EV', 'Electric Vehicle'),
-        ('Manual', 'Manual'),
-        ('AI', 'Artificial Intelligence'),
-    ]
     name = models.CharField(max_length=200)
     description = models.TextField()
     categories = models.ManyToManyField(Category, related_name='companies')
@@ -93,7 +81,6 @@ class Company(models.Model):
     duration_months = models.PositiveIntegerField(default=12)
     company_scale = models.PositiveIntegerField(default=1, help_text="Scale of company (1=startup, 5=mid-size, 10=large)")
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES, default='North India')
-    technology_type = models.CharField(max_length=50, choices=TECHNOLOGY_CHOICES, default='Manual')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

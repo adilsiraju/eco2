@@ -142,3 +142,9 @@ footer {
 .social-icon:hover {
     color: var(--secondary-color);
 }
+
+.card-img-top {
+    height: 200px; /* Fixed height */
+    width: 100%;   /* Full width of the card */
+    object-fit: cover; /* Crops image to fit while maintaining aspect ratio */
+}

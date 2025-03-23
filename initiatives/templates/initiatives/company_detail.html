@@ -11,7 +11,7 @@
                         <p class="text-muted mb-4">
                             Categories: {% for category in company.categories.all %}{{ category.name }}{% if not forloop.last %}, {% endif %}{% endfor %} | 
                             {{ company.status|title }} | 
-                            Location: {{ company.location }} | Tech: {{ company.technology_type }}
+                            Location: {{ company.location }}
                         </p>
                         {% if company.image %}
                             <img src="{{ company.image.url }}" class="img-fluid mb-4 rounded" alt="{{ company.name }}">

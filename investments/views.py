@@ -11,10 +11,10 @@ impact_calculator = ImpactCalculator()
 def invest_initiative(request, initiative_id):
     initiative = get_object_or_404(Initiative, pk=initiative_id)
     if request.method == 'POST':
-        amount = float(request.POST.get('amount'))
+        amount = Decimal(request.POST.get('amount'))
         carbon_reduced, energy_saved, water_conserved = impact_calculator.predict_impact(
             investment_amount=amount,
-            category_name=initiative.categories.first().name,  # Use first category for now
+            category_name=initiative.categories.first().name,
             project_duration_months=initiative.duration_months,
             project_scale=initiative.project_scale,
             location=initiative.location,
@@ -53,11 +53,10 @@ def invest_company(request, company_id):
             })
         carbon_reduced, energy_saved, water_conserved = impact_calculator.predict_impact(
             investment_amount=amount,
-            category_name=company.categories.first().name,  # Use first category for now
+            category_name=company.categories.first().name,
             project_duration_months=company.duration_months,
             project_scale=company.company_scale,
-            location=company.location,
-            technology_type=company.technology_type
+            location=company.location
         )
         investment = Investment(
             user=request.user,

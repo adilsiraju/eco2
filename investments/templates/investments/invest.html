@@ -19,7 +19,6 @@
                         <p class="text-muted">
                             Category: {% if initiative %}{{ initiative.category.name }}{% elif company %}{{ company.category.name }}{% endif %} | 
                             Location: {% if initiative %}{{ initiative.location }}{% elif company %}{{ company.location }}{% endif %} | 
-                            Tech: {% if initiative %}{{ initiative.technology_type }}{% elif company %}{{ company.technology_type }}{% endif %}
                         </p>
                         <p>{% if initiative %}{{ initiative.description|truncatewords:30 }}{% elif company %}{{ company.description|truncatewords:30 }}{% endif %}</p>
                         {% if initiative %}

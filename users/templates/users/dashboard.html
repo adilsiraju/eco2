@@ -72,8 +72,8 @@
                                 </p>
                                 <p class="card-text text-muted">
                                     <small>
-                                        Location: {% if investment.initiative %}{{ investment.initiative.location }}{% elif investment.company %}{{ investment.company.location }}{% endif %} | 
-                                        Tech: {% if investment.initiative %}{{ investment.initiative.technology_type }}{% elif investment.company %}{{ investment.company.technology_type }}{% endif %}
+                                        Location: {% if investment.initiative %}{{ investment.initiative.location }}{% elif investment.company %}{{ investment.company.location }}{% endif %}
+                                        {% if investment.initiative %} | Tech: {{ investment.initiative.technology_type }}{% endif %}
                                     </small>
                                 </p>
                                 <p class="card-text">Date: {{ investment.created_at|date:"F d, Y" }}</p>
