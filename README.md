@@ -1,6 +1,9 @@
 # The Ecovest: Sustainable Investing Platform
+![image](https://github.com/user-attachments/assets/ffd7a980-ad4a-48a9-9d8a-f7af51c50dba)
+![image](https://github.com/user-attachments/assets/3e2e57fc-e557-421b-86e1-e215ae5e595a)
+![image](https://github.com/user-attachments/assets/bc506045-8141-4315-9494-34f037663047)
 
-Eco2 is a sustainable investing platform designed to connect environmentally conscious investors with vetted sustainable projects and companies. Our mission is to make sustainable investing accessible, transparent, and impactful for everyone.
+Ecovest is a sustainable investing platform designed to connect environmentally conscious investors with vetted sustainable projects and companies. Our mission is to make sustainable investing accessible, transparent, and impactful for everyone.
 
 ## Features
 
