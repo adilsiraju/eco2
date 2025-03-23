@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from initiatives.models import Initiative, Company
 from .models import Investment
 from .impact_calculator import ImpactCalculator
+from decimal import Decimal
 
 impact_calculator = ImpactCalculator()
 
@@ -13,7 +14,7 @@ def invest_initiative(request, initiative_id):
         amount = float(request.POST.get('amount'))
         carbon_reduced, energy_saved, water_conserved = impact_calculator.predict_impact(
             investment_amount=amount,
-            category_name=initiative.category.name,
+            category_name=initiative.categories.first().name,  # Use first category for now
             project_duration_months=initiative.duration_months,
             project_scale=initiative.project_scale,
             location=initiative.location,
@@ -52,7 +53,7 @@ def invest_company(request, company_id):
             })
         carbon_reduced, energy_saved, water_conserved = impact_calculator.predict_impact(
             investment_amount=amount,
-            category_name=company.category.name,
+            category_name=company.categories.first().name,  # Use first category for now
             project_duration_months=company.duration_months,
             project_scale=company.company_scale,
             location=company.location,

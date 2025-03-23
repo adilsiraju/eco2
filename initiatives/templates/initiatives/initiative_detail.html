@@ -9,7 +9,8 @@
                     <div class="card-body p-4">
                         <h2 class="card-title">{{ initiative.title }}</h2>
                         <p class="text-muted mb-4">
-                            {{ initiative.category.name }} | {{ initiative.status|title }} | 
+                            Categories: {% for category in initiative.categories.all %}{{ category.name }}{% if not forloop.last %}, {% endif %}{% endfor %} | 
+                            {{ initiative.status|title }} | 
                             Location: {{ initiative.location }} | Tech: {{ initiative.technology_type }}
                         </p>
                         {% if initiative.image %}
@@ -25,7 +26,7 @@
                         <p>Duration: {{ initiative.duration_months }} months | Scale: {{ initiative.project_scale }}</p>
                         <p>Created: {{ initiative.created_at|date:"F d, Y" }}</p>
                         {% if user.is_authenticated and initiative.status == 'active' %}
-                            <a href="{% url 'invest' initiative.id %}" class="btn btn-primary">Invest Now</a>
+                            <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-primary">Invest Now</a>
                         {% elif not user.is_authenticated %}
                             <p><a href="{% url 'login' %}">Login</a> to invest in this initiative.</p>
                         {% else %}

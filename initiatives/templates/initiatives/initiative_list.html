@@ -28,7 +28,11 @@
                             <img src="https://source.unsplash.com/random/600x400/?sustainability" class="card-img-top" alt="{{ initiative.title }}">
                         {% endif %}
                         <div class="card-body">
-                            <span class="badge bg-primary mb-2">{{ initiative.category.name }}</span>
+                            <div class="mb-2">
+                                {% for category in initiative.categories.all %}
+                                    <span class="badge bg-primary me-1">{{ category.name }}</span>
+                                {% endfor %}
+                            </div>
                             <h4 class="card-title">{{ initiative.title }}</h4>
                             <p class="card-text">{{ initiative.description|truncatewords:20 }}</p>
                             <p class="card-text text-muted">

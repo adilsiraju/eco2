@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% load django_bootstrap5 %}
 {% block title %}Sustainable Investing for a Greener Future{% endblock %}
 {% block content %}
@@ -15,7 +16,7 @@
                 </div>
             </div>
             <div class="col-lg-6 d-none d-lg-block text-center">
-                <img src="https://source.unsplash.com/random/600x400/?sustainability,investment" alt="Sustainable Investing" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
+                <img src="{% static 'images/hero.jpg' %}" alt="Sustainable Investing" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
             </div>
         </div>
     </div>
@@ -101,66 +102,42 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card project-card h-100">
-                    <img src="https://source.unsplash.com/random/600x400/?solar,panels" class="card-img-top" alt="Solar Energy Project">
-                    <div class="card-body">
-                        <span class="badge bg-primary mb-2">Renewable Energy</span>
-                        <h4 class="card-title">Community Solar Farm</h4>
-                        <p class="card-text">Fund solar installations in underserved communities, providing clean energy and reducing utility bills.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-success fw-bold">85% Funded</span>
-                            <span class="text-muted">Target: ₹20,00,000</span>
+            {% for initiative in featured_initiatives %}
+                <div class="col-lg-4 mb-4">
+                    <div class="card project-card h-100">
+                        {% if initiative.image %}
+                            <img src="{{ initiative.image.url }}" class="card-img-top" alt="{{ initiative.title }}">
+                        {% else %}
+                            <img src="https://source.unsplash.com/random/600x400/?{{ initiative.categories.first.name|lower }}" class="card-img-top" alt="{{ initiative.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="mb-2">
+                                {% for category in initiative.categories.all %}
+                                    <span class="badge bg-primary me-1">{{ category.name }}</span>
+                                {% endfor %}
+                            </div>
+                            <h4 class="card-title">{{ initiative.title }}</h4>
+                            <p class="card-text">{{ initiative.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success fw-bold">
+                                    {% widthratio initiative.current_amount initiative.goal_amount 100|floatformat:0 %}% Funded
+                                </span>
+                                <span class="text-muted">Target: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
                         </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="card-footer bg-white border-0">
+                            <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-primary w-100">Invest Now</a>
                         </div>
-                    </div>
-                    <div class="card-footer bg-white border-0">
-                        <a href="{% url 'initiative_list' %}" class="btn btn-primary w-100">Invest Now</a>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <div class="card project-card h-100">
-                    <img src="https://source.unsplash.com/random/600x400/?reforestation,forest" class="card-img-top" alt="Reforestation Project">
-                    <div class="card-body">
-                        <span class="badge bg-success mb-2">Conservation</span>
-                        <h4 class="card-title">Amazon Reforestation</h4>
-                        <p class="card-text">Help restore deforested areas in the Amazon rainforest, protecting biodiversity and sequestering carbon.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-success fw-bold">62% Funded</span>
-                            <span class="text-muted">Target: ₹15,00,000</span>
-                        </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-0">
-                        <a href="{% url 'initiative_list' %}" class="btn btn-primary w-100">Invest Now</a>
-                    </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No featured projects available at the moment. Check back soon!</p>
                 </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <div class="card project-card h-100">
-                    <img src="https://source.unsplash.com/random/600x400/?ocean,plastic" class="card-img-top" alt="Ocean Cleanup Project">
-                    <div class="card-body">
-                        <span class="badge bg-info mb-2">Ocean Conservation</span>
-                        <h4 class="card-title">Ocean Plastic Recycling</h4>
-                        <p class="card-text">Support innovative technology that collects and recycles ocean plastic into sustainable products.</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-success fw-bold">41% Funded</span>
-                            <span class="text-muted">Target: ₹25,00,000</span>
-                        </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-0">
-                        <a href="{% url 'initiative_list' %}" class="btn btn-primary w-100">Invest Now</a>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         <div class="text-center mt-4">
             <a href="{% url 'initiative_list' %}" class="btn btn-outline-primary btn-lg">View All Projects</a>

@@ -9,7 +9,8 @@
                     <div class="card-body p-4">
                         <h2 class="card-title">{{ company.name }}</h2>
                         <p class="text-muted mb-4">
-                            {{ company.category.name }} | {{ company.status|title }} | 
+                            Categories: {% for category in company.categories.all %}{{ category.name }}{% if not forloop.last %}, {% endif %}{% endfor %} | 
+                            {{ company.status|title }} | 
                             Location: {{ company.location }} | Tech: {{ company.technology_type }}
                         </p>
                         {% if company.image %}

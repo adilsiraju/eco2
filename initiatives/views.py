@@ -4,7 +4,7 @@ from .models import Initiative, Category, Company
 def initiative_list(request):
     category_name = request.GET.get('category')
     if category_name:
-        initiatives = Initiative.objects.filter(category__name=category_name, status='active')
+        initiatives = Initiative.objects.filter(categories__name=category_name, status='active')
     else:
         initiatives = Initiative.objects.filter(status='active')
     categories = Category.objects.all()
@@ -17,7 +17,7 @@ def initiative_detail(request, pk):
 def company_list(request):
     category_name = request.GET.get('category')
     if category_name:
-        companies = Company.objects.filter(category__name=category_name, status='active')
+        companies = Company.objects.filter(categories__name=category_name, status='active')
     else:
         companies = Company.objects.filter(status='active')
     categories = Category.objects.all()

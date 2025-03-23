@@ -28,7 +28,11 @@
                             <img src="https://source.unsplash.com/random/600x400/?business,sustainability" class="card-img-top" alt="{{ company.name }}">
                         {% endif %}
                         <div class="card-body">
-                            <span class="badge bg-primary mb-2">{{ company.category.name }}</span>
+                            <div class="mb-2">
+                                {% for category in initiative.categories.all %}
+                                    <span class="badge bg-primary me-1">{{ company.category.name }}</span>
+                                {% endfor %}
+                            </div>
                             <h4 class="card-title">{{ company.name }}</h4>
                             <p class="card-text">{{ company.description|truncatewords:20 }}</p>
                             <p class="card-text text-muted">
