@@ -1,94 +1,40 @@
 # The Ecovest: Sustainable Investing Platform
-![image](https://github.com/user-attachments/assets/ffd7a980-ad4a-48a9-9d8a-f7af51c50dba)
-![image](https://github.com/user-attachments/assets/3e2e57fc-e557-421b-86e1-e215ae5e595a)
-![image](https://github.com/user-attachments/assets/bc506045-8141-4315-9494-34f037663047)
 
-Ecovest is a sustainable investing platform designed to connect environmentally conscious investors with vetted sustainable projects and companies. Our mission is to make sustainable investing accessible, transparent, and impactful for everyone.
+![image](https://github.com/user-attachments/assets/4476700f-8d9e-4750-9f17-287efabffb51)
 
-## Features
 
-- **Sustainable Projects and Companies**: Browse and invest in a variety of sustainable initiatives and companies across renewable energy, conservation, clean water, green technology, and more.
-- **Impact Tracking**: Monitor the environmental impact of your investments through detailed metrics such as carbon emissions reduced, energy saved, and water conserved.
-- **User Dashboard**: Track your investment portfolio and see the real-world impact of your contributions.
-- **Secure Investments**: Ensure your investments are secure and transparent, with detailed project and company profiles.
+Overview
+--------
 
-## Getting Started
+Ecovest is a sustainable investing platform founded in 2025, dedicated to connecting environmentally conscious investors with high-impact, eco-friendly opportunities. It empowers individuals to support a greener future by funding initiatives and startup companies that align with both financial goals and environmental values.
 
-### Prerequisites
+Investment Options
+------------------
 
-- Python 3.11
-- Django 5.1.7
-- PostgreSQL (or SQLite for development)
+*   **Initiatives**: Projects focused on sustainability, such as renewable energy, water conservation, and recycling, offering measurable environmental benefits.
+    
+*   **Startup Companies**: Innovative green technology and sustainability-focused firms, providing investors a chance to back emerging leaders in the eco-space.
+    
+![image](https://github.com/user-attachments/assets/6b024469-906f-40a9-bb57-3224ecceb921)
 
-### Installation
+Key Features
+------------
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/eco2.git
-   cd eco2
-   ```
+*   **AI-Powered Impact Prediction**: Utilizes an advanced AI model, trained on real-world data from 2015–2025, to forecast environmental outcomes—carbon reduced (kg CO2), energy saved (kWh), and water conserved (L)—across multiple categories like Renewable Energy and Green Technology.
+    
+*   **User Experience**: Investors can browse curated opportunities, invest with ease, and monitor portfolio performance and impact through a transparent, intuitive dashboard.
+    
+![image](https://github.com/user-attachments/assets/86e055c3-dd86-42ac-bf3f-46acca98630e)
 
-2. **Set Up Virtual Environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+Achievements
+------------
 
-3. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+*   **Development Stage**: As a newly launched startup in 2025, Ecovest is currently in the development phase, building its platform and establishing partnerships to fund its first wave of sustainable initiatives and companies.
+    
+*   **Future Goals**: Aims to fund over 1,000 projects, attract $50 million in investments, and reduce 100,000+ tons of CO2 within its first five years.
+    
 
-4. **Database Setup**:
-   - Create a database and update the `DATABASES` setting in `ecovest/settings.py` with your database credentials.
-   - Run the following commands to apply migrations:
-     ```bash
-     python manage.py makemigrations
-     python manage.py migrate
-     ```
-
-5. **Create a Superuser**:
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-6. **Run the Development Server**:
-   ```bash
-   python manage.py runserver
-   ```
-
-7. **Access the Application**:
-   Open your browser and go to `http://127.0.0.1:8000/` to see the application in action.
-
-## Project Structure
-
-- **core**: Contains the main views and templates for the landing page and error pages.
-- **ecovest**: The main Django project directory containing settings and URL configurations.
-- **initiatives**: Manages sustainable initiatives and companies, including models, views, and templates.
-- **investments**: Handles investment logic, impact calculations, and related views and templates.
-- **users**: Manages user authentication, profiles, and dashboard views.
-- **media**: Stores uploaded images for initiatives, companies, and user profiles.
-- **static**: Contains static files such as CSS and images.
-- **templates**: HTML templates for rendering views.
-
-## Contributing
-
-We welcome contributions from the community! If you'd like to contribute, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For any questions or support, please contact us at [support@eco2.com](mailto:support@eco2.com).
-
----
-
-Join us in making a positive impact on the environment while generating returns on your investments. Together, we can create a sustainable future!
+Mission 
+-------
+*   **Mission**: To make sustainable investing accessible, impactful, and profitable for everyone, proving that financial returns and planetary good can coexist.
+    
