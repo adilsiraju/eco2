@@ -8,6 +8,11 @@ Overview
 
 Ecovest is a sustainable investing platform founded in 2025, dedicated to connecting environmentally conscious investors with high-impact, eco-friendly opportunities. It empowers individuals to support a greener future by funding initiatives and startup companies that align with both financial goals and environmental values.
 
+Mission 
+-------
+*   **Mission**: To make sustainable investing accessible, impactful, and profitable for everyone, proving that financial returns and planetary good can coexist.
+    
+
 Investment Options
 ------------------
 
@@ -32,9 +37,4 @@ Achievements
 *   **Development Stage**: As a newly launched startup in 2025, Ecovest is currently in the development phase, building its platform and establishing partnerships to fund its first wave of sustainable initiatives and companies.
     
 *   **Future Goals**: Aims to fund over 1,000 projects, attract $50 million in investments, and reduce 100,000+ tons of CO2 within its first five years.
-    
-
-Mission 
--------
-*   **Mission**: To make sustainable investing accessible, impactful, and profitable for everyone, proving that financial returns and planetary good can coexist.
     
