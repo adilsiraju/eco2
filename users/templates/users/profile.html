@@ -3,11 +3,11 @@
 {% load static %}
 {% block title %}Your Profile - Ecovest{% endblock %}
 {% block content %}
-<!-- Header Section -->
-<section class="py-5 bg-light">
+<!-- Hero Section -->
+<section class="hero">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-12">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
                 <div class="mb-4">
                     {% if user.profile.profile_image %}
                         <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3 profile-img" alt="Profile Image">
@@ -18,7 +18,10 @@
                 <h1 class="display-4 fw-bold mb-4">
                     {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}'s Profile
                 </h1>
-                <p class="lead text-muted">Update your personal and profile details below</p>
+                <p class="lead mb-4">Update your personal and profile details below</p>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <img src="https://source.unsplash.com/random/600x400/?sustainability,profile" alt="Profile Overview" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
             </div>
         </div>
     </div>
@@ -29,7 +32,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body p-4">
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
@@ -47,6 +50,43 @@
 </section>
 
 <style>
+    :root {
+        --primary-color: #2E8B57;
+        --secondary-color: #3CB371;
+        --accent-color: #F0F8FF;
+        --dark-color: #1E3F40;
+        --light-color: #F5F5F5;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, rgba(46, 139, 87, 0.9) 0%, rgba(60, 179, 113, 0.8) 100%), url('https://source.unsplash.com/random/1920x1080/?nature,sustainability') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 100px 0;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+    .initiative-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+    }
+
+    .initiative-card:hover {
+        transform: translateY(-5px);
+    }
+
     .profile-img {
         width: 120px;
         height: 120px;

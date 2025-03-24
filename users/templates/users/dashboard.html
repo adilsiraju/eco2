@@ -3,17 +3,38 @@
 {% load investment_tags %}
 {% block title %}Your Dashboard - Ecovest{% endblock %}
 {% block content %}
-<!-- Header Section -->
-<section class="py-5 bg-light">
+<!-- Hero Section -->
+<section class="hero">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-12">
-                
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="mb-4">
+                    {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3 profile-img" alt="Profile Image">
+                    {% else %}
+                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle mb-3 profile-img" alt="Default Profile Image">
+                    {% endif %}
+                </div>
                 <h1 class="display-4 fw-bold mb-4">
                     Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!
                 </h1>
-                <p class="lead text-muted">Track your investments and their impact in real-time</p>
-                
+                <p class="lead mb-4">Track your investments and their impact in real-time</p>
+                <div class="mt-3">
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    {% if user.profile.phone_number %}
+                        <p><strong>Phone:</strong> {{ user.profile.phone_number }}</p>
+                    {% endif %}
+                    {% if user.profile.city or user.profile.country %}
+                        <p><strong>Location:</strong> 
+                            {% if user.profile.city %}{{ user.profile.city }}{% endif %}
+                            {% if user.profile.city and user.profile.country %}, {% endif %}
+                            {% if user.profile.country %}{{ user.profile.country }}{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <img src="https://source.unsplash.com/random/600x400/?sustainability,impact" alt="Impact Dashboard" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
             </div>
         </div>
     </div>
@@ -23,13 +44,13 @@
 <section class="py-5">
     <div class="container">
         <div class="row mb-5">
-            <div class="col-md-12">
+            <div class="col-md-12 text-center">
                 <h2 class="fw-bold">Investment Overview</h2>
             </div>
         </div>
         <div class="row text-center">
             <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body">
                         <i class="fas fa-dollar-sign feature-icon text-success mb-3"></i>
                         <h5>Total Invested</h5>
@@ -38,7 +59,7 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body">
                         <i class="fas fa-cloud feature-icon text-primary mb-3"></i>
                         <h5>Carbon Reduced</h5>
@@ -47,7 +68,7 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body">
                         <i class="fas fa-bolt feature-icon text-warning mb-3"></i>
                         <h5>Energy Saved</h5>
@@ -56,7 +77,7 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body">
                         <i class="fas fa-tint feature-icon text-info mb-3"></i>
                         <h5>Water Conserved</h5>
@@ -65,7 +86,7 @@
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
+                <div class="card initiative-card">
                     <div class="card-body">
                         <i class="fas fa-seedling feature-icon text-success mb-3"></i>
                         <h5>Total Holdings</h5>
@@ -78,22 +99,22 @@
 </section>
 
 <!-- Initiative Holdings Section -->
-<section class="py-5 bg-light">
+<section class="py-5">
     <div class="container">
         <div class="row mb-5">
-            <div class="col-md-12">
+            <div class="col-md-12 text-center">
                 <h2 class="fw-bold">Initiative Holdings</h2>
-                <p class="text-muted">Your investments in sustainable projects</p>
+                <p class="lead text-muted">Your investments in sustainable projects</p>
             </div>
         </div>
         {% if initiative_investments %}
             <div class="row">
                 {% for investment in initiative_investments %}
                     <div class="col-md-6 mb-4">
-                        <div class="card shadow-sm h-100">
+                        <div class="card initiative-card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">{{ investment.initiative__title }}</h5>
-                                <p class="text-muted">
+                                <p class="text-muted mb-2">
                                     {% with initiative=investment.initiative__id|lookup:initiatives %}
                                         {% for category in initiative.categories.all %}
                                             <span class="badge bg-primary me-1">{{ category.name }}</span>
@@ -110,7 +131,7 @@
                                         <p><strong>Water Conserved:</strong> {{ investment.total_water_conserved|floatformat:0 }} L</p>
                                     </div>
                                 </div>
-                                <a href="{% url 'initiative_detail' investment.initiative__id %}" class="btn btn-outline-primary mt-3">View Details</a>
+                                <a href="{% url 'initiative_detail' investment.initiative__id %}" class="btn btn-primary w-100 mt-3">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -124,14 +145,53 @@
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="py-5 bg-light">
-    <div class="container text-center">
-        <h3 class="fw-bold mb-4">Grow Your Impact</h3>
-        <p class="lead mb-4">Explore more opportunities to invest in a sustainable future.</p>
-        <a href="{% url 'initiative_list' %}" class="btn btn-primary me-2">Browse Initiatives</a>
-    </div>
-</section>
+<style>
+    :root {
+        --primary-color: #2E8B57;
+        --secondary-color: #3CB371;
+        --accent-color: #F0F8FF;
+        --dark-color: #1E3F40;
+        --light-color: #F5F5F5;
+    }
 
+    .hero {
+        background: linear-gradient(135deg, rgba(46, 139, 87, 0.9) 0%, rgba(60, 179, 113, 0.8) 100%), url('https://source.unsplash.com/random/1920x1080/?nature,sustainability') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 100px 0;
+    }
 
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+    .initiative-card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+    }
+
+    .initiative-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+    }
+</style>
 {% endblock %}
