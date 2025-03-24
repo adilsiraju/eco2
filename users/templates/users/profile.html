@@ -1,25 +1,43 @@
 {% extends 'core/base.html' %}
 {% load django_bootstrap5 %}
-{% block title %}Profile{% endblock %}
+{% load static %}
+{% block title %}Your Profile - Ecovest{% endblock %}
 {% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-12">
+                <div class="mb-4">
+                    {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3 profile-img" alt="Profile Image">
+                    {% else %}
+                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle mb-3 profile-img" alt="Default Profile Image">
+                    {% endif %}
+                </div>
+                <h1 class="display-4 fw-bold mb-4">
+                    {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}'s Profile
+                </h1>
+                <p class="lead text-muted">Update your personal and profile details below</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Profile Form Section -->
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Your Profile</h2>
-                        <div class="text-center mb-4">
-                            {% if user.profile.profile_image %}
-                                <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3" width="100" alt="Profile Image">
-                            {% else %}
-                                <p>No profile image set.</p>
-                            {% endif %}
-                        </div>
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {% bootstrap_form form %}
-                            <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                            <h4 class="mb-3">Personal Information</h4>
+                            {% bootstrap_form user_form %}
+                            <h4 class="mb-3 mt-4">Profile Details</h4>
+                            {% bootstrap_form profile_form %}
+                            <button type="submit" class="btn btn-primary w-100 mt-3">Update Profile</button>
                         </form>
                     </div>
                 </div>
@@ -27,4 +45,13 @@
         </div>
     </div>
 </section>
+
+<style>
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+</style>
 {% endblock %}

@@ -1,8 +1,6 @@
 {% extends 'core/base.html' %}
 {% block title %}
-    {% if initiative %}Invest in {{ initiative.title }}
-    {% elif company %}Invest in {{ company.name }}
-    {% endif %}
+    Invest in {{ initiative.title }}
 {% endblock %}
 {% block content %}
 <section class="py-5">
@@ -12,20 +10,15 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
                         <h2 class="card-title mb-4">
-                            {% if initiative %}Invest in {{ initiative.title }}
-                            {% elif company %}Invest in {{ company.name }}
-                            {% endif %}
+                            {% if initiative %}Invest in {{ initiative.title }}{% endif %}
                         </h2>
                         <p class="text-muted">
-                            Category: {% if initiative %}{{ initiative.category.name }}{% elif company %}{{ company.category.name }}{% endif %} | 
-                            Location: {% if initiative %}{{ initiative.location }}{% elif company %}{{ company.location }}{% endif %} | 
+                            Category: {% if initiative %}{{ initiative.category.name }}{% endif %} | 
+                            Location: {% if initiative %}{{ initiative.location }}{% endif %} | 
                         </p>
-                        <p>{% if initiative %}{{ initiative.description|truncatewords:30 }}{% elif company %}{{ company.description|truncatewords:30 }}{% endif %}</p>
+                        <p>{% if initiative %}{{ initiative.description|truncatewords:30 }}{% endif %}</p>
                         {% if initiative %}
                             <p>Raised: ₹{{ initiative.current_amount|floatformat:2 }} of ₹{{ initiative.goal_amount|floatformat:2 }}</p>
-                        {% elif company %}
-                            <p>Shares Sold: {{ company.shares_sold }} of {{ company.total_shares }} (₹{{ company.share_price|floatformat:2 }}/share)</p>
-                            <p>Total Value: ₹{{ company.total_value|floatformat:2 }} | Current Value: ₹{{ company.current_value|floatformat:2 }}</p>
                         {% endif %}
                         {% if error %}
                             <p class="text-danger">{{ error }}</p>
@@ -36,10 +29,6 @@
                                 {% if initiative %}
                                     <label for="amount" class="form-label">Investment Amount (₹)</label>
                                     <input type="number" class="form-control" id="amount" name="amount" min="1" step="0.01" required>
-                                {% elif company %}
-                                    <label for="shares" class="form-label">Number of Shares</label>
-                                    <input type="number" class="form-control" id="shares" name="shares" min="1" max="{{ company.shares_remaining }}" required>
-                                    <small class="form-text text-muted">Cost: ₹{{ company.share_price|floatformat:2 }} per share</small>
                                 {% endif %}
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Invest Now</button>

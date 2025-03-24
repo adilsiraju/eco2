@@ -8,8 +8,12 @@
     <div class="container">
         <div class="row text-center">
             <div class="col-md-12">
-                <h1 class="display-4 fw-bold mb-4">Your Ecovest Dashboard</h1>
+                
+                <h1 class="display-4 fw-bold mb-4">
+                    Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!
+                </h1>
                 <p class="lead text-muted">Track your investments and their impact in real-time</p>
+                
             </div>
         </div>
     </div>
@@ -120,62 +124,14 @@
     </div>
 </section>
 
-<!-- Company Holdings Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12">
-                <h2 class="fw-bold">Company Holdings</h2>
-                <p class="text-muted">Your investments in sustainable startups</p>
-            </div>
-        </div>
-        {% if company_investments %}
-            <div class="row">
-                {% for investment in company_investments %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ investment.company__name }}</h5>
-                                <p class="text-muted">
-                                    {% with company=investment.company__id|lookup:companies %}
-                                        {% for category in company.categories.all %}
-                                            <span class="badge bg-primary me-1">{{ category.name }}</span>
-                                        {% endfor %}
-                                    {% endwith %}
-                                </p>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <p><strong>Amount Invested:</strong> ₹{{ investment.total_amount|floatformat:2 }}</p>
-                                        <p><strong>Shares Owned:</strong> {{ investment.total_shares }}</p>
-                                        <p><strong>Carbon Reduced:</strong> {{ investment.total_carbon_reduced|floatformat:0 }} kg</p>
-                                    </div>
-                                    <div class="col-6">
-                                        <p><strong>Share Price:</strong> ₹{{ investment.company__share_price|floatformat:2 }}</p>
-                                        <p><strong>Energy Saved:</strong> {{ investment.total_energy_saved|floatformat:0 }} kWh</p>
-                                        <p><strong>Water Conserved:</strong> {{ investment.total_water_conserved|floatformat:0 }} L</p>
-                                    </div>
-                                </div>
-                                <a href="{% url 'company_detail' investment.company__id %}" class="btn btn-outline-primary mt-3">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center">
-                <p>No company investments yet. <a href="{% url 'company_list' %}">Explore startups now!</a></p>
-            </div>
-        {% endif %}
-    </div>
-</section>
-
 <!-- Call to Action -->
 <section class="py-5 bg-light">
     <div class="container text-center">
         <h3 class="fw-bold mb-4">Grow Your Impact</h3>
         <p class="lead mb-4">Explore more opportunities to invest in a sustainable future.</p>
         <a href="{% url 'initiative_list' %}" class="btn btn-primary me-2">Browse Initiatives</a>
-        <a href="{% url 'company_list' %}" class="btn btn-primary">Browse Startups</a>
     </div>
 </section>
+
+
 {% endblock %}
