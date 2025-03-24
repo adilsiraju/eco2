@@ -7,7 +7,7 @@ from django.conf import settings
 
 class ImpactCalculator:
     def __init__(self):
-        self.model_carbon = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)  # Further reduce overfitting
+        self.model_carbon = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
         self.model_energy = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
         self.model_water = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
         self.scaler = StandardScaler()
@@ -16,6 +16,7 @@ class ImpactCalculator:
         self.model_file_carbon = os.path.join(settings.BASE_DIR, 'investments/models/carbon_model.pkl')
         self.model_file_energy = os.path.join(settings.BASE_DIR, 'investments/models/energy_model.pkl')
         self.model_file_water = os.path.join(settings.BASE_DIR, 'investments/models/water_model.pkl')
+        self.scaler_file = os.path.join(settings.BASE_DIR, 'investments/models/scaler.pkl')  # New scaler file
         self.categories = [
             'Renewable Energy', 'Recycling', 'Emission Control', 'Water Conservation',
             'Reforestation', 'Sustainable Agriculture', 'Clean Transportation',
@@ -25,34 +26,28 @@ class ImpactCalculator:
 
     def train_model(self):
         X = np.array([
-            # Large-scale (reduced influence)
             [125000000000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 10, 0, 0],
             [4150000000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 5, 0, 8],
-            # Small-scale renewable energy (more weight)
             [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
             [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
-            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],  # Tripled
+            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
             [50000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 7, 0, 1],
-            # Small-scale waste management
             [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
             [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
             [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
-            # Small-scale water conservation
             [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
-            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],  # Tripled
+            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [20000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 18, 5, 1, 8],
-            # New small-scale initiatives
             [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],
-            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],  # Doubled
+            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],
             [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],
-            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],  # Doubled
+            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],
             [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],
-            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],  # Doubled
+            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],
             [15000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 3, 0, 5],
             [15000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],
             [15000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 0, 8],
-            # Other small-scale
             [10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [25000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 1, 4],
             [30000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 6, 0, 0],
@@ -76,7 +71,8 @@ class ImpactCalculator:
 
         X_transformed = X.copy()
         X_transformed[:, 0] = np.log1p(X[:, 0])
-        X_transformed = self.scaler.fit_transform(X_transformed)
+        self.scaler.fit(X_transformed)  # Fit scaler here
+        X_transformed = self.scaler.transform(X_transformed)
 
         self.model_carbon.fit(X_transformed, y_carbon)
         self.model_energy.fit(X_transformed, y_energy)
@@ -89,17 +85,22 @@ class ImpactCalculator:
             pickle.dump(self.model_energy, f)
         with open(self.model_file_water, 'wb') as f:
             pickle.dump(self.model_water, f)
+        with open(self.scaler_file, 'wb') as f:  # Save fitted scaler
+            pickle.dump(self.scaler, f)
 
     def load_or_train_model(self):
         if (os.path.exists(self.model_file_carbon) and
             os.path.exists(self.model_file_energy) and
-            os.path.exists(self.model_file_water)):
+            os.path.exists(self.model_file_water) and
+            os.path.exists(self.scaler_file)):  # Check scaler file too
             with open(self.model_file_carbon, 'rb') as f:
                 self.model_carbon = pickle.load(f)
             with open(self.model_file_energy, 'rb') as f:
                 self.model_energy = pickle.load(f)
             with open(self.model_file_water, 'rb') as f:
                 self.model_water = pickle.load(f)
+            with open(self.scaler_file, 'rb') as f:  # Load scaler
+                self.scaler = pickle.load(f)
         else:
             self.train_model()
 
@@ -135,7 +136,6 @@ class ImpactCalculator:
         base_investment = 15000
         scaling_factor = investment_amount / base_investment
 
-        # Apply scaling with dynamic caps
         if 'Water Conservation' in category_names:
             carbon_reduced = min(carbon_reduced * scaling_factor, 500 * scaling_factor)
             energy_saved = min(energy_saved * scaling_factor, 300 * scaling_factor)
