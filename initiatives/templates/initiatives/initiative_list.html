@@ -34,7 +34,8 @@
                                 {% endfor %}
                             </div>
                             <h4 class="card-title">{{ initiative.title }}</h4>
-                            <p class="card-text">{{ initiative.description|truncatewords:20 }}</p>
+                            <p class="card-text">{{ initiative.description|linebreaks|truncatewords:20 }}</p>
+                            
                             <p class="card-text text-muted">
                                 <small>Location: {{ initiative.location }} | Tech: {{ initiative.technology_type }}</small>
                             </p>

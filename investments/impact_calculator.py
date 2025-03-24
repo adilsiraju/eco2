@@ -26,52 +26,129 @@ class ImpactCalculator:
 
     def train_model(self):
         X = np.array([
-            [125000000000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 10, 0, 0],
-            [4150000000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 5, 0, 8],
-            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
+            # Original large-scale (unchanged)
+            [125000000000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 10, 0, 0],  # Renewable Energy
+            [4150000000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 5, 0, 8],    # Water Conservation
+            
+            # Original small-scale (tripled entries kept)
+            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],  # Renewable Energy
             [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
             [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
             [50000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 7, 0, 1],
+            [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],  # Waste Management/Recycling
             [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
             [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
-            [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
-            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
+            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],  # Water Conservation
             [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [20000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 18, 5, 1, 8],
+            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],  # Sustainable Agriculture
             [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],
-            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],
+            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],  # Clean Transportation
             [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],
-            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],
+            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],  # Waste Management
             [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],
-            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],
-            [15000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 3, 0, 5],
-            [15000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],
-            [15000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 0, 8],
+            [15000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 3, 0, 5],  # Emission Control
+            [15000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],  # Green Technology
+            [15000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 0, 8],  # Ocean Conservation
             [10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
             [25000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 1, 4],
             [30000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 6, 0, 0],
             [8000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 2, 1, 8],
+
+            # New small-scale initiatives
+            [500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 0, 0],    # Micro solar lantern
+            [1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 2, 1, 0],  # Small solar panel
+            [5000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 3, 2, 4],  # Community recycling bin
+            [2000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 2, 0, 5],  # Small emission scrubber
+            [1000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 1, 1, 8],   # Rainwater harvesting kit
+            [500, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 6, 1, 0, 3],    # Compost pile
+            [2500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 3, 2, 7],  # Electric bike subsidy
+            [3000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 2, 1, 4],  # Waste sorting unit
+            [4000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],  # AI waste monitor
+            [2000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 2, 3, 8],  # Beach cleanup kit
+            [10000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 0, 1], # Wind turbine prototype
+            [7500, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 1, 3],  # Organic farm plot
+            [8000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 2, 8],  # Coral restoration
+            [500, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 1, 0, 8],    # Tree planting micro-fund
+            [20000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 18, 5, 1, 7], # EV charging station
         ])
 
         y_carbon = np.array([
-            25000000, 500000, 1575, 1575, 1575, 3000, 750, 750, 750, 300, 300, 300, 400,
+            # Original large-scale
+            25000000, 500000,
+            # Original small-scale
+            1575, 1575, 1575, 3000, 750, 750, 750, 300, 300, 300, 400,
             750, 750, 500, 500, 300, 300, 750, 800, 600, 500, 800, 2000, 300,
+            # New small-scale
+            50,    # Micro solar lantern
+            100,   # Small solar panel
+            250,   # Community recycling bin
+            150,   # Small emission scrubber
+            50,    # Rainwater harvesting kit
+            25,    # Compost pile
+            200,   # Electric bike subsidy
+            300,   # Waste sorting unit
+            400,   # AI waste monitor
+            150,   # Beach cleanup kit
+            800,   # Wind turbine prototype
+            300,   # Organic farm plot
+            500,   # Coral restoration
+            50,    # Tree planting micro-fund
+            1000,  # EV charging station
         ])
 
         y_energy = np.array([
-            15000000, 0, 3375, 3375, 3375, 4800, 1500, 1500, 1500, 150, 150, 150, 200,
+            # Original large-scale
+            15000000, 0,
+            # Original small-scale
+            3375, 3375, 3375, 4800, 1500, 1500, 1500, 150, 150, 150, 200,
             0, 0, 1500, 1500, 0, 0, 500, 1000, 0, 0, 0, 4000, 0,
+            # New small-scale
+            100,   # Micro solar lantern
+            200,   # Small solar panel
+            500,   # Community recycling bin
+            100,   # Small emission scrubber
+            20,    # Rainwater harvesting kit
+            0,     # Compost pile
+            600,   # Electric bike subsidy
+            400,   # Waste sorting unit
+            600,   # AI waste monitor
+            0,     # Beach cleanup kit
+            1200,  # Wind turbine prototype
+            0,     # Organic farm plot
+            0,     # Coral restoration
+            0,     # Tree planting micro-fund
+            2000,  # EV charging station
         ])
 
         y_water = np.array([
-            0, 10000000, 0, 0, 0, 0, 0, 0, 0, 400000, 400000, 400000, 600000,
+            # Original large-scale
+            0, 10000000,
+            # Original small-scale
+            0, 0, 0, 0, 0, 0, 0, 400000, 400000, 400000, 600000,
             0, 0, 0, 0, 7500, 7500, 0, 0, 0, 2000, 1000, 0, 800,
+            # New small-scale
+            0,      # Micro solar lantern
+            0,      # Small solar panel
+            0,      # Community recycling bin
+            0,      # Small emission scrubber
+            5000,   # Rainwater harvesting kit
+            200,    # Compost pile
+            0,      # Electric bike subsidy
+            0,      # Waste sorting unit
+            0,      # AI waste monitor
+            0,      # Beach cleanup kit
+            0,      # Wind turbine prototype
+            1000,   # Organic farm plot
+            2000,   # Coral restoration
+            0,      # Tree planting micro-fund
+            0,      # EV charging station
         ])
 
         X_transformed = X.copy()
         X_transformed[:, 0] = np.log1p(X[:, 0])
-        self.scaler.fit(X_transformed)  # Fit scaler here
+        self.scaler.fit(X_transformed)
         X_transformed = self.scaler.transform(X_transformed)
 
         self.model_carbon.fit(X_transformed, y_carbon)
@@ -85,7 +162,7 @@ class ImpactCalculator:
             pickle.dump(self.model_energy, f)
         with open(self.model_file_water, 'wb') as f:
             pickle.dump(self.model_water, f)
-        with open(self.scaler_file, 'wb') as f:  # Save fitted scaler
+        with open(self.scaler_file, 'wb') as f:
             pickle.dump(self.scaler, f)
 
     def load_or_train_model(self):

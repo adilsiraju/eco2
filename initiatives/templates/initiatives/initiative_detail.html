@@ -18,7 +18,7 @@
                         {% else %}
                             <img src="https://source.unsplash.com/random/800x400/?sustainability" class="img-fluid mb-4 rounded" alt="{{ initiative.title }}">
                         {% endif %}
-                        <p>{{ initiative.description }}</p>
+                        <p>{{ initiative.description|linebreaks }}</p>
                         <div class="progress mb-3">
                             <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
