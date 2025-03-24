@@ -1,7 +1,7 @@
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, choices=[
+    name = models.CharField(max_length=100, unique=True, choices=[
         ('Renewable Energy', 'Renewable Energy'),
         ('Recycling', 'Recycling'),
         ('Emission Control', 'Emission Control'),
