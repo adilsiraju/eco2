@@ -1,235 +1,288 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% load investment_tags %}
-{% block title %}Your Dashboard - Ecovest{% endblock %}
+{% load humanize %}
+{% block title %}My Dashboard - Ecovest{% endblock %}
 
 {% block extra_css %}
 <style>
-.chart-container {
-    position: relative;
-    height: 300px;
-    width: 100%;
-}
-.chart-container.large {
-    height: 400px;
-}
-.card {
-    transition: transform 0.2s;
-}
-.card:hover {
-    transform: translateY(-5px);
-}
+    .hero {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    }
+    .stat-card i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+    .stat-card h3 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .stat-card p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    .dashboard-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    .investment-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+    .investment-card:hover {
+        transform: translateY(-5px);
+    }
+    .investment-image {
+        height: 150px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .investment-content {
+        padding: 1.5rem;
+    }
+    .investment-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+    .investment-amount {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+    .impact-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .impact-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .impact-stat i {
+        color: #28a745;
+    }
+    .chart-container {
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .ai-insight-card {
+        border-left: 4px solid;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        border-radius: 0 10px 10px 0;
+    }
+    .ai-insight-card.high {
+        border-left-color: #dc3545;
+    }
+    .ai-insight-card.medium {
+        border-left-color: #ffc107;
+    }
+    .ai-insight-card.low {
+        border-left-color: #28a745;
+    }
+    .ai-insight-card i {
+        margin-right: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero">
+<div class="hero">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="mb-4">
-                    {% if user.profile.profile_image %}
-                        <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3 profile-img" alt="Profile Image">
-                    {% else %}
-                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle mb-3 profile-img" alt="Default Profile Image">
-                    {% endif %}
-                </div>
-                <h1 class="display-4 fw-bold mb-4">
-                    Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!
-                </h1>
-                <p class="lead mb-4">Track your investments and their impact in real-time</p>
-                <div class="mt-3">
-                    <p><strong>Email:</strong> {{ user.email }}</p>
-                    {% if user.profile.phone_number %}
-                        <p><strong>Phone:</strong> {{ user.profile.phone_number }}</p>
-                    {% endif %}
-                    {% if user.profile.city or user.profile.country %}
-                        <p><strong>Location:</strong> 
-                            {% if user.profile.city %}{{ user.profile.city }}{% endif %}
-                            {% if user.profile.city and user.profile.country %}, {% endif %}
-                            {% if user.profile.country %}{{ user.profile.country }}{% endif %}
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col-lg-6 d-none d-lg-block text-center">
-                <img src="https://source.unsplash.com/random/600x400/?sustainability,impact" alt="Impact Dashboard" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Overview Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">Investment Overview</h2>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="card initiative-card">
-                    <div class="card-body">
-                        <i class="fas fa-dollar-sign feature-icon text-success mb-3"></i>
-                        <h5>Total Invested</h5>
-                        <h3 class="fw-bold">₹{{ total_invested|floatformat:2 }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card initiative-card">
-                    <div class="card-body">
-                        <i class="fas fa-cloud feature-icon text-primary mb-3"></i>
-                        <h5>Carbon Reduced</h5>
-                        <h3 class="fw-bold">{{ total_carbon_reduced|floatformat:0 }} kg</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card initiative-card">
-                    <div class="card-body">
-                        <i class="fas fa-bolt feature-icon text-warning mb-3"></i>
-                        <h5>Energy Saved</h5>
-                        <h3 class="fw-bold">{{ total_energy_saved|floatformat:0 }} kWh</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card initiative-card">
-                    <div class="card-body">
-                        <i class="fas fa-tint feature-icon text-info mb-3"></i>
-                        <h5>Water Conserved</h5>
-                        <h3 class="fw-bold">{{ total_water_conserved|floatformat:0 }} L</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card initiative-card">
-                    <div class="card-body">
-                        <i class="fas fa-seedling feature-icon text-success mb-3"></i>
-                        <h5>Total Holdings</h5>
-                        <h3 class="fw-bold">{{ total_holdings }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Charts Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">Investment Analytics</h2>
-                <p class="lead text-muted">Visual insights into your sustainable investments</p>
-            </div>
-        </div>
         <div class="row">
-            <!-- Investment Distribution Chart -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Investment Distribution by Category</h5>
-                        <div class="chart-container">
-                            <canvas id="categoryChart"></canvas>
-                        </div>
-                    </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-wallet"></i>
+                    <h3>₹{{ total_invested|intcomma }}</h3>
+                    <p>Total Invested</p>
                 </div>
             </div>
-            <!-- Monthly Investment Trends -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Monthly Investment Trends</h5>
-                        <div class="chart-container">
-                            <canvas id="trendsChart"></canvas>
-                        </div>
-                    </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-cloud"></i>
+                    <h3>{{ total_impact.carbon|intcomma }}</h3>
+                    <p>CO₂ Reduced</p>
                 </div>
             </div>
-            <!-- Impact Metrics Chart -->
-            <div class="col-md-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Impact Metrics Over Time</h5>
-                        <div class="chart-container large">
-                            <canvas id="impactChart"></canvas>
-                        </div>
-                    </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>{{ total_impact.energy|intcomma }}</h3>
+                    <p>Energy Saved</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-tint"></i>
+                    <h3>{{ total_impact.water|intcomma }}</h3>
+                    <p>Water Conserved</p>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Initiative Holdings Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">Initiative Holdings</h2>
-                <p class="lead text-muted">Your investments in sustainable projects</p>
+<div class="container">
+    <!-- AI Portfolio Insights -->
+    <div class="dashboard-card">
+        <h2 class="mb-4">
+            <i class="fas fa-robot text-primary"></i> AI Portfolio Insights
+        </h2>
+        {% if portfolio_recommendations %}
+            {% for rec in portfolio_recommendations %}
+            <div class="ai-insight-card {{ rec.severity }}">
+                <i class="fas {% if rec.severity == 'high' %}fa-exclamation-circle{% elif rec.severity == 'medium' %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %}"></i>
+                {{ rec.message }}
             </div>
-        </div>
-        {% if initiative_investments %}
-            <div class="row">
-                {% for investment in initiative_investments %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card initiative-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ investment.initiative__title }}</h5>
-                                <p class="text-muted mb-2">
-                                    {% with initiative=investment.initiative__id|lookup:initiatives %}
-                                        {% for category in initiative.categories.all %}
-                                            <span class="badge bg-primary me-1">{{ category.name }}</span>
-                                        {% endfor %}
-                                    {% endwith %}
-                                </p>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <p><strong>Amount Invested:</strong> ₹{{ investment.total_amount|floatformat:2 }}</p>
-                                        <p><strong>Carbon Reduced:</strong> {{ investment.total_carbon_reduced|floatformat:0 }} kg</p>
-                                    </div>
-                                    <div class="col-6">
-                                        <p><strong>Energy Saved:</strong> {{ investment.total_energy_saved|floatformat:0 }} kWh</p>
-                                        <p><strong>Water Conserved:</strong> {{ investment.total_water_conserved|floatformat:0 }} L</p>
-                                    </div>
-                                </div>
-                                <a href="{% url 'initiative_detail' investment.initiative__id %}" class="btn btn-primary w-100 mt-3">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+            {% endfor %}
         {% else %}
-            <div class="text-center">
-                <p>No initiative investments yet. <a href="{% url 'initiative_list' %}">Start investing now!</a></p>
+            <div class="ai-insight-card low">
+                <i class="fas fa-check-circle"></i>
+                Your portfolio is well-balanced and diversified!
             </div>
         {% endif %}
     </div>
-</section>
+
+    <!-- Recent Investments -->
+    <div class="dashboard-card">
+        <h2 class="mb-4">Recent Investments</h2>
+        <div class="row g-4">
+            {% for investment in recent_investments %}
+            <div class="col-md-4">
+                <div class="investment-card">
+                    {% if investment.initiative.image %}
+                    <img src="{{ investment.initiative.image.url }}" alt="{{ investment.initiative.title }}" class="investment-image">
+                    {% else %}
+                    <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="investment-image">
+                    {% endif %}
+                    <div class="investment-content">
+                        <h3 class="investment-title">{{ investment.initiative.title }}</h3>
+                        <div class="investment-amount">₹{{ investment.amount|intcomma }}</div>
+                        
+                        <div class="impact-stats">
+                            <div class="impact-stat">
+                                <i class="fas fa-cloud"></i>
+                                {{ investment.initiative.carbon_impact|floatformat:0|intcomma }} kg
+                            </div>
+                            <div class="impact-stat">
+                                <i class="fas fa-bolt"></i>
+                                {{ investment.initiative.energy_impact|floatformat:0|intcomma }} kWh
+                            </div>
+                            <div class="impact-stat">
+                                <i class="fas fa-tint"></i>
+                                {{ investment.initiative.water_impact|floatformat:0|intcomma }} L
+                            </div>
+                        </div>
+                        
+                        <div class="text-muted small">
+                            <i class="fas fa-calendar"></i> {{ investment.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No investments yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Investment Distribution -->
+    <div class="dashboard-card">
+        <h2 class="mb-4">Investment Distribution</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact by Category -->
+    <div class="dashboard-card">
+        <h2 class="mb-4">Impact by Category</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>CO₂ Reduced</th>
+                        <th>Energy Saved</th>
+                        <th>Water Conserved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category_name, impact in impact_by_category.items %}
+                    <tr>
+                        <td>{{ category_name }}</td>
+                        <td>{{ impact.carbon|floatformat:0|intcomma }} kg</td>
+                        <td>{{ impact.energy|floatformat:0|intcomma }} kWh</td>
+                        <td>{{ impact.water|floatformat:0|intcomma }} L</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Parse the JSON data safely
-    const categoryData = JSON.parse('{{ category_investments|escapejs }}');
-    const monthlyData = JSON.parse('{{ monthly_investments|escapejs }}');
-
     // Category Distribution Chart
-    new Chart(document.getElementById('categoryChart'), {
-        type: 'pie',
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
         data: {
-            labels: categoryData.map(item => item.initiative__categories__name || 'Uncategorized'),
+            labels: [{% for cat in category_distribution %}'{{ cat.initiative__categories__name|default:"Uncategorized" }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
             datasets: [{
-                data: categoryData.map(item => item.total_amount || 0),
+                data: [{% for cat in category_distribution %}{{ cat.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
                 backgroundColor: [
-                    '#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2',
-                    '#20c997', '#e83e8c', '#fd7e14', '#6f42c1', '#007bff'
+                    '#28a745',
+                    '#20c997',
+                    '#17a2b8',
+                    '#6c757d',
+                    '#ffc107'
                 ]
             }]
         },
@@ -238,110 +291,34 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'right',
-                    labels: {
-                        boxWidth: 12
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `₹${context.raw.toLocaleString()}`;
-                        }
-                    }
+                    position: 'right'
                 }
             }
         }
     });
 
-    // Monthly Investment Trends Chart
-    new Chart(document.getElementById('trendsChart'), {
+    // Investment Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
         type: 'line',
         data: {
-            labels: monthlyData.map(item => {
-                const date = new Date(item.month);
-                return date.toLocaleDateString('default', { month: 'short', year: 'numeric' });
-            }),
+            labels: [{% for trend in monthly_trends %}'{{ trend.month|date:"M Y" }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
             datasets: [{
-                label: 'Investment Amount (₹)',
-                data: monthlyData.map(item => item.total_amount || 0),
+                label: 'Monthly Investments',
+                data: [{% for trend in monthly_trends %}{{ trend.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
                 borderColor: '#28a745',
-                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                fill: true,
                 tension: 0.1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `₹${context.raw.toLocaleString()}`;
-                        }
-                    }
-                }
-            },
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + value.toLocaleString();
-                        }
-                    }
+                    beginAtZero: true
                 }
             }
         }
     });
-
-    // Impact Metrics Chart
-    new Chart(document.getElementById('impactChart'), {
-        type: 'bar',
-        data: {
-            labels: monthlyData.map(item => {
-                const date = new Date(item.month);
-                return date.toLocaleDateString('default', { month: 'short', year: 'numeric' });
-            }),
-            datasets: [{
-                label: 'Carbon Reduced (kg)',
-                data: monthlyData.map(item => item.total_carbon_reduced || 0),
-                backgroundColor: '#28a745'
-            }, {
-                label: 'Energy Saved (kWh)',
-                data: monthlyData.map(item => item.total_energy_saved || 0),
-                backgroundColor: '#ffc107'
-            }, {
-                label: 'Water Conserved (L)',
-                data: monthlyData.map(item => item.total_water_conserved || 0),
-                backgroundColor: '#17a2b8'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString();
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
 </script>
 {% endblock %}

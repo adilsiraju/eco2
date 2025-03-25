@@ -1,42 +1,267 @@
 {% extends 'core/base.html' %}
-{% block title %}
-    Invest in {{ initiative.title }}
+{% load static %}
+{% block title %}Invest in {{ initiative.title }} - Ecovest{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+}
+.investment-form {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.impact-preview {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+.impact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.impact-icon {
+    width: 40px;
+    height: 40px;
+    background: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: #28a745;
+    font-size: 1.2rem;
+}
+.info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    height: 100%;
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s;
+}
+.info-card:hover {
+    transform: translateY(-5px);
+}
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+.btn-invest {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.investment-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+.summary-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.summary-total {
+    font-weight: 600;
+    color: #28a745;
+}
+.content-wrapper {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+</style>
 {% endblock %}
+
 {% block content %}
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h2 class="card-title mb-4">
-                            {% if initiative %}Invest in {{ initiative.title }}{% endif %}
-                        </h2>
-                        <p class="text-muted">
-                            Category: {% if initiative %}{{ initiative.category.name }}{% endif %} | 
-                            Location: {% if initiative %}{{ initiative.location }}{% endif %} | 
-                        </p>
-                        <p>{% if initiative %}{{ initiative.description|truncatewords:30 }}{% endif %}</p>
-                        {% if initiative %}
-                            <p>Raised: ₹{{ initiative.current_amount|floatformat:2 }} of ₹{{ initiative.goal_amount|floatformat:2 }}</p>
-                        {% endif %}
-                        {% if error %}
-                            <p class="text-danger">{{ error }}</p>
-                        {% endif %}
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                {% if initiative %}
-                                    <label for="amount" class="form-label">Investment Amount (₹)</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" min="1" step="0.01" required>
-                                {% endif %}
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Invest Now</button>
-                        </form>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="content-wrapper">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">Invest in {{ initiative.title }}</h1>
+                <p class="lead text-white-50">Join us in making a sustainable impact through this innovative green initiative.</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="card bg-white bg-opacity-10 border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-white">Progress</span>
+                            <span class="text-white">{% widthratio initiative.current_amount initiative.goal_amount 100 %}%</span>
+                        </div>
+                        <div class="progress bg-white bg-opacity-25 mb-3">
+                            <div class="progress-bar bg-white" role="progressbar" 
+                                 style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-white-50">
+                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2 }}</span>
+                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<div class="content-wrapper">
+    <div class="row">
+        <!-- Investment Form -->
+        <div class="col-lg-8">
+            <div class="investment-form">
+                <h3 class="mb-4">Investment Details</h3>
+                <form method="post" id="investmentForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="amount" class="form-label">Investment Amount (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control form-control-lg" id="amount" name="amount" 
+                                   min="1000" step="100" required
+                                   placeholder="Enter amount (minimum ₹1,000)">
+                        </div>
+                        <div class="form-text">Minimum investment: ₹1,000</div>
+                    </div>
+
+                    <div class="impact-preview">
+                        <h5 class="mb-3">Your Impact Preview</h5>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Carbon Reduction</div>
+                                <div class="text-muted" id="carbonImpact">0 kg CO₂</div>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Energy Saved</div>
+                                <div class="text-muted" id="energyImpact">0 kWh</div>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold">Water Conserved</div>
+                                <div class="text-muted" id="waterImpact">0 L</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investment-summary">
+                        <h5 class="mb-3">Investment Summary</h5>
+                        <div class="summary-item">
+                            <span>Investment Amount</span>
+                            <span id="summaryAmount">₹0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Platform Fee (2%)</span>
+                            <span id="summaryFee">₹0</span>
+                        </div>
+                        <div class="summary-item summary-total">
+                            <span>Total Amount</span>
+                            <span id="summaryTotal">₹0</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-invest">
+                            Confirm Investment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="info-card mb-4">
+                <h5 class="card-title mb-3">Initiative Overview</h5>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Technology</small>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-microchip text-primary me-2"></i>
+                        {{ initiative.technology_type }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Duration</small>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        {{ initiative.duration_months }} months
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Location</small>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        {{ initiative.location }}
+                    </div>
+                </div>
+                <div>
+                    <small class="text-muted d-block mb-1">Categories</small>
+                    {% for category in initiative.categories.all %}
+                        <span class="badge bg-light text-dark me-2">{{ category.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('amount').addEventListener('input', function(e) {
+    const amount = parseFloat(e.target.value) || 0;
+    
+    // Update impact preview
+    const carbonImpact = (amount / {{ initiative.goal_amount }}) * {{ initiative.carbon_impact }};
+    const energyImpact = (amount / {{ initiative.goal_amount }}) * {{ initiative.energy_impact }};
+    const waterImpact = (amount / {{ initiative.goal_amount }}) * {{ initiative.water_impact }};
+    
+    document.getElementById('carbonImpact').textContent = `${carbonImpact.toFixed(1)} kg CO₂`;
+    document.getElementById('energyImpact').textContent = `${energyImpact.toFixed(1)} kWh`;
+    document.getElementById('waterImpact').textContent = `${waterImpact.toFixed(1)} L`;
+    
+    // Update investment summary
+    const fee = amount * 0.02;
+    const total = amount + fee;
+    
+    document.getElementById('summaryAmount').textContent = `₹${amount.toFixed(2)}`;
+    document.getElementById('summaryFee').textContent = `₹${fee.toFixed(2)}`;
+    document.getElementById('summaryTotal').textContent = `₹${total.toFixed(2)}`;
+});
+
+document.getElementById('investmentForm').addEventListener('submit', function(e) {
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (amount < 1000) {
+        e.preventDefault();
+        alert('Minimum investment amount is ₹1,000');
+    }
+});
+</script>
 {% endblock %}

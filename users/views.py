@@ -10,6 +10,11 @@ from django.db.models.functions import TruncMonth
 from datetime import datetime, timedelta
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from investments.portfolio_analyzer import PortfolioAnalyzer
+from investments.impact_calculator import ImpactCalculator
+from django.db.models.functions import Coalesce
+from django.db.models import DecimalField, FloatField
+from collections import defaultdict
 
 def register(request):
     if request.method == 'POST':
@@ -26,61 +31,131 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    # Fetch user's investments
-    investments = Investment.objects.filter(user=request.user)
-
-    # Aggregate initiative investments
-    initiative_investments = investments.filter(initiative__isnull=False).values(
-        'initiative__id', 'initiative__title'
-    ).annotate(
-        total_amount=Sum('amount'),
-        total_carbon_reduced=Sum('carbon_reduced'),
-        total_energy_saved=Sum('energy_saved'),
-        total_water_conserved=Sum('water_conserved')
-    ).order_by('initiative__id')
-
-    # Calculate totals
-    total_invested = sum(inv['total_amount'] for inv in initiative_investments)
-    total_carbon_reduced = sum(inv['total_carbon_reduced'] for inv in initiative_investments)
-    total_energy_saved = sum(inv['total_energy_saved'] for inv in initiative_investments)
-    total_water_conserved = sum(inv['total_water_conserved'] for inv in initiative_investments)
-    total_holdings = initiative_investments.count()
-
+    user = request.user
+    investments = user.investments.all().select_related('initiative')
+    
+    # Calculate total invested amount
+    total_invested = investments.aggregate(
+        total=Coalesce(Sum('amount'), 0, output_field=DecimalField())
+    )['total']
+    
+    # Initialize impact calculator
+    impact_calculator = ImpactCalculator()
+    
+    # Calculate total impact metrics using ImpactCalculator
+    total_impact = {
+        'carbon': 0,
+        'energy': 0,
+        'water': 0
+    }
+    
+    # Initialize category impact dictionary
+    impact_by_category = defaultdict(lambda: {'carbon': 0, 'energy': 0, 'water': 0})
+    
+    for investment in investments:
+        # Get category names for the initiative
+        category_names = [cat.name for cat in investment.initiative.categories.all()]
+        
+        # Calculate impact for this investment
+        carbon, energy, water = impact_calculator.predict_impact(
+            investment_amount=float(investment.amount),
+            category_names=category_names,
+            project_duration_months=investment.initiative.duration_months,
+            project_scale=investment.initiative.project_scale,
+            location=investment.initiative.location,
+            technology_type=investment.initiative.technology_type
+        )
+        
+        # Add to total impact
+        total_impact['carbon'] += carbon
+        total_impact['energy'] += energy
+        total_impact['water'] += water
+        
+        # Add to category impact
+        for category_name in category_names:
+            # Calculate impact for this category
+            cat_carbon, cat_energy, cat_water = impact_calculator.predict_impact(
+                investment_amount=float(investment.amount),
+                category_names=[category_name],  # Calculate impact for this category only
+                project_duration_months=investment.initiative.duration_months,
+                project_scale=investment.initiative.project_scale,
+                location=investment.initiative.location,
+                technology_type=investment.initiative.technology_type
+            )
+            
+            # Add to category totals
+            impact_by_category[category_name]['carbon'] += cat_carbon
+            impact_by_category[category_name]['energy'] += cat_energy
+            impact_by_category[category_name]['water'] += cat_water
+    
+    # Round the impact metrics
+    total_impact = {
+        'carbon': round(total_impact['carbon']),
+        'energy': round(total_impact['energy']),
+        'water': round(total_impact['water'])
+    }
+    
+    # Round category impacts
+    for category in impact_by_category:
+        impact_by_category[category] = {
+            'carbon': round(impact_by_category[category]['carbon']),
+            'energy': round(impact_by_category[category]['energy']),
+            'water': round(impact_by_category[category]['water'])
+        }
+    
+    # Get recent investments
+    recent_investments = investments.order_by('-created_at')[:5]
+    
     # Get investment distribution by category
-    category_investments = investments.values(
+    category_distribution = investments.values(
         'initiative__categories__name'
     ).annotate(
-        total_amount=Sum('amount')
-    ).exclude(initiative__categories__name__isnull=True)
-
-    # Get monthly investment trends (last 12 months)
-    twelve_months_ago = datetime.now() - timedelta(days=365)
-    monthly_investments = investments.filter(
-        created_at__gte=twelve_months_ago
-    ).annotate(
+        total=Sum('amount')
+    ).order_by('-total')
+    
+    # Get monthly investment trends
+    monthly_trends = investments.annotate(
         month=TruncMonth('created_at')
     ).values('month').annotate(
-        total_amount=Sum('amount'),
-        total_carbon_reduced=Sum('carbon_reduced'),
-        total_energy_saved=Sum('energy_saved'),
-        total_water_conserved=Sum('water_conserved')
+        total=Sum('amount')
     ).order_by('month')
-
-    # Convert Decimal and datetime objects to JSON-serializable format
-    category_investments_json = json.dumps(list(category_investments), cls=DjangoJSONEncoder)
-    monthly_investments_json = json.dumps(list(monthly_investments), cls=DjangoJSONEncoder)
-
+    
+    # Initialize portfolio analyzer and get recommendations
+    try:
+        analyzer = PortfolioAnalyzer()
+        portfolio_analysis = analyzer.get_diversification_recommendations(user)
+        
+        # Convert Decimal values to float for JSON serialization
+        portfolio_analysis['category_distribution'] = {
+            k: float(v) for k, v in portfolio_analysis['category_distribution'].items()
+        }
+        portfolio_analysis['technology_distribution'] = {
+            k: float(v) for k, v in portfolio_analysis['technology_distribution'].items()
+        }
+        
+        portfolio_recommendations = portfolio_analysis['recommendations']
+    except Exception as e:
+        # If there's an error in portfolio analysis, provide default values
+        portfolio_analysis = {
+            'category_distribution': {},
+            'technology_distribution': {},
+            'recommendations': []
+        }
+        portfolio_recommendations = []
+        print(f"Portfolio analysis error: {str(e)}")  # Log the error
+    
     context = {
-        'initiative_investments': initiative_investments,
-        'initiatives': Initiative.objects.all(),  # For lookup filter
+        'user': user,
         'total_invested': total_invested,
-        'total_carbon_reduced': total_carbon_reduced,
-        'total_energy_saved': total_energy_saved,
-        'total_water_conserved': total_water_conserved,
-        'total_holdings': total_holdings,
-        'category_investments': category_investments_json,
-        'monthly_investments': monthly_investments_json,
+        'total_impact': total_impact,
+        'recent_investments': recent_investments,
+        'category_distribution': category_distribution,
+        'monthly_trends': monthly_trends,
+        'impact_by_category': dict(impact_by_category),  # Convert defaultdict to regular dict
+        'portfolio_analysis': json.dumps(portfolio_analysis, cls=DjangoJSONEncoder),
+        'portfolio_recommendations': portfolio_recommendations,
     }
+    
     return render(request, 'users/dashboard.html', context)
 
 @login_required

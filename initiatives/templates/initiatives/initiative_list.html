@@ -1,78 +1,293 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Initiatives - Ecovest{% endblock %}
+{% load humanize %}
+{% block title %}Sustainable Investment Opportunities - Ecovest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    }
+    .stat-card i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+    .stat-card h3 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .stat-card p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    .initiative-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+    .initiative-card:hover {
+        transform: translateY(-5px);
+    }
+    .initiative-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .initiative-content {
+        padding: 1.5rem;
+    }
+    .initiative-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+    .initiative-description {
+        color: #6c757d;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .progress {
+        height: 8px;
+        margin-bottom: 1rem;
+    }
+    .impact-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .impact-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .impact-stat i {
+        color: #28a745;
+    }
+    .initiative-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+    .location {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .btn-learn-more {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    .btn-learn-more:hover {
+        background: #218838;
+        color: white;
+    }
+    .pagination {
+        margin-top: 2rem;
+    }
+    .page-link {
+        color: #28a745;
+    }
+    .page-item.active .page-link {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
-<section class="hero">
+<div class="hero">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">Discover All Initiatives</h1>
-                <p class="lead mb-4">Browse through our comprehensive list of sustainable initiatives and find the ones that resonate with your values.</p>
-                <div>
-                    <a href="{% url 'initiative_list' %}" class="btn btn-light btn-lg me-2 mb-2 mb-md-0">Explore Initiatives</a>
-                    <a href="{% url 'learn_more' %}" class="btn btn-outline-light btn-lg">Learn More</a>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>{{ total_initiatives|intcomma }}</h3>
+                    <p>Active Projects</p>
                 </div>
             </div>
-            <div class="col-lg-6 d-none d-lg-block text-center">
-                <img src="https://source.unsplash.com/random/600x400/?sustainability,investment" alt="Sustainable Investing" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <h3>{{ total_investors|intcomma }}</h3>
+                    <p>Total Investors</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-rupee-sign"></i>
+                    <h3>₹{{ total_invested|intcomma }}</h3>
+                    <p>Total Invested</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-cloud"></i>
+                    <h3>{{ total_carbon|intcomma }}</h3>
+                    <p>CO₂ Reduced</p>
+                </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Initiatives List Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">All Initiatives</h2>
-                <p class="lead text-muted">Explore all the initiatives available for investment on Ecovest.</p>
+<div class="container">
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
-        <div class="mb-4">
-            <label for="categoryFilter" class="form-label">Filter by Category:</label>
-            <select id="categoryFilter" class="form-select w-auto d-inline-block" onchange="window.location.href=this.value">
-                <option value="{% url 'initiative_list' %}">All</option>
-                {% for category in categories %}
-                    <option value="{% url 'initiative_list' %}?category={{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="row">
-            {% for initiative in initiatives %}
-                <div class="col-lg-4 mb-4">
-                    <div class="card initiative-card h-100">
-                        {% if initiative.image %}
-                            <img src="{{ initiative.image.url }}" class="card-img-top" alt="{{ initiative.title }}">
-                        {% else %}
-                            <img src="https://source.unsplash.com/random/600x400/?{{ initiative.categories.first.name|lower }}" class="card-img-top" alt="{{ initiative.title }}">
-                        {% endif %}
-                        <div class="card-body">
-                            <h4 class="card-title">{{ initiative.title }}</h4>
-                            <p class="text-muted mb-2">
-                                {% for category in initiative.categories.all %}
-                                    <span class="badge bg-primary me-1">{{ category.name }}</span>
-                                {% endfor %}
-                            </p>
-                            <p class="card-text">{{ initiative.description|linebreaks|truncatewords:20 }}</p>
-                            <p class="card-text text-muted">
-                                <small>Location: {{ initiative.location }} | Tech: {{ initiative.technology_type }}</small>
-                            </p>
-                            <div class="progress mb-3">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p>Raised: ₹{{ initiative.current_amount|floatformat:2 }} of ₹{{ initiative.goal_amount|floatformat:2 }}</p>
-                            <a href="{% url 'initiative_detail' initiative.id %}" class="btn btn-primary w-100">Learn More</a>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    {% for value, label in initiatives.0.STATUS_CHOICES %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="progress" {% if request.GET.sort == 'progress' %}selected{% endif %}>Progress</option>
+                    <option value="amount" {% if request.GET.sort == 'amount' %}selected{% endif %}>Amount</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Search initiatives..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Initiatives Grid -->
+    <div class="row g-4">
+        {% for initiative in initiatives %}
+        <div class="col-md-4">
+            <div class="initiative-card">
+                {% if initiative.image %}
+                <img src="{{ initiative.image.url }}" alt="{{ initiative.title }}" class="initiative-image">
+                {% else %}
+                <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="initiative-image">
+                {% endif %}
+                <div class="initiative-content">
+                    <h3 class="initiative-title">{{ initiative.title }}</h3>
+                    <p class="initiative-description">{{ initiative.description|truncatewords:30 }}</p>
+                    
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ initiative.get_progress_percentage }}%"
+                             aria-valuenow="{{ initiative.get_progress_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ initiative.get_progress_percentage|floatformat:1 }}%
                         </div>
                     </div>
+                    
+                    <div class="impact-stats">
+                        <div class="impact-stat">
+                            <i class="fas fa-cloud"></i>
+                            {{ initiative.carbon_impact|intcomma }} kg
+                        </div>
+                        <div class="impact-stat">
+                            <i class="fas fa-bolt"></i>
+                            {{ initiative.energy_impact|intcomma }} kWh
+                        </div>
+                        <div class="impact-stat">
+                            <i class="fas fa-tint"></i>
+                            {{ initiative.water_impact|intcomma }} L
+                        </div>
+                    </div>
+                    
+                    <div class="initiative-footer">
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i> {{ initiative.location }}
+                        </div>
+                        <a href="{% url 'initiative_detail' initiative.pk %}" class="btn-learn-more">
+                            Learn More
+                        </a>
+                    </div>
                 </div>
-            {% empty %}
-                <div class="col-12 text-center">
-                    <p>No initiatives available at the moment.</p>
-                </div>
-            {% endfor %}
+            </div>
         </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No initiatives found matching your criteria.</p>
+        </div>
+        {% endfor %}
     </div>
-</section>
+
+    <!-- Pagination -->
+    {% if initiatives.has_other_pages %}
+    <nav aria-label="Page navigation" class="pagination justify-content-center">
+        <ul class="pagination">
+            {% if initiatives.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ initiatives.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in initiatives.paginator.page_range %}
+            <li class="page-item {% if initiatives.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if initiatives.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ initiatives.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
 {% endblock %}
