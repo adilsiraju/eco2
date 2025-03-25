@@ -1,50 +1,243 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load humanize %}
 {% block title %}Sustainable Investing for a Greener Future{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("{% static 'images/pattern.png' %}") repeat;
+    opacity: 0.1;
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+.hero-image {
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: transform 0.3s ease;
+}
+.hero-image:hover {
+    transform: perspective(1000px) rotateY(0deg);
+}
+.feature-icon {
+    font-size: 2.5rem;
+    color: #28a745;
+    margin-bottom: 1.5rem;
+}
+.metrics-section {
+    background: #f8f9fa;
+    padding: 5rem 0;
+    position: relative;
+}
+.metric-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+.metric-card:hover {
+    transform: translateY(-10px);
+}
+.metric-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+.how-it-works {
+    padding: 5rem 0;
+}
+.step-card {
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+}
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: #28a745;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-weight: 600;
+}
+.step-icon {
+    font-size: 2.5rem;
+    color: #28a745;
+    margin-bottom: 1.5rem;
+}
+.featured-section {
+    background: #f8f9fa;
+    padding: 5rem 0;
+}
+.project-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+.project-card:hover {
+    transform: translateY(-10px);
+}
+.project-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+.project-card .card-body {
+    padding: 1.5rem;
+}
+.project-card .progress {
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+.impact-section {
+    padding: 5rem 0;
+}
+.impact-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+.impact-card:hover {
+    transform: translateY(-10px);
+}
+.impact-icon {
+    font-size: 2.5rem;
+    color: #28a745;
+    margin-bottom: 1.5rem;
+}
+.testimonial-section {
+    background: #f8f9fa;
+    padding: 5rem 0;
+}
+.testimonial-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    height: 100%;
+}
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #28a745;
+}
+.about-section {
+    padding: 5rem 0;
+}
+.about-image {
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+.cta-section {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("{% static 'images/pattern.png' %}") repeat;
+    opacity: 0.1;
+}
+.cta-content {
+    position: relative;
+    z-index: 1;
+}
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+.section-subtitle {
+    font-size: 1.25rem;
+    color: #6c757d;
+    margin-bottom: 3rem;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6">
+            <div class="col-lg-6 hero-content">
                 <h1 class="display-4 fw-bold mb-4">Invest in a Sustainable Future</h1>
                 <p class="lead mb-4">Connect with eco-friendly projects that generate returns while making a positive impact on our planet.</p>
                 <div>
-                    <a href="{% url 'initiative_list' %}" class="btn btn-light btn-lg me-2 mb-2 mb-md-0">Start Investing</a>
+                    <a href="{% url 'initiative_list' %}" class="btn btn-light btn-lg me-3 mb-2 mb-md-0">Start Investing</a>
                     <a href="{% url 'learn_more' %}" class="btn btn-outline-light btn-lg">Learn More</a>
                 </div>
             </div>
-            <div class="col-lg-6 d-none d-lg-block text-center">
-                <img src="{% static 'images/hero.jpg' %}" alt="Sustainable Investing" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="{% static 'images/hero.jpg' %}" alt="Sustainable Investing" class="img-fluid hero-image">
             </div>
         </div>
     </div>
 </section>
 
 <!-- Key Metrics Section -->
-<section class="py-5 bg-light">
+<section class="metrics-section">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4 mb-md-0">
-                <div class="p-4">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="metric-card">
                     <i class="fas fa-tree feature-icon"></i>
-                    <h2 class="h1 fw-bold">1,200+</h2>
-                    <p class="lead">Projects Funded</p>
+                    <div class="metric-number">1,200+</div>
+                    <p class="lead mb-0">Projects Funded</p>
                 </div>
             </div>
-            <div class="col-md-4 mb-4 mb-md-0">
-                <div class="p-4">
+            <div class="col-md-4 mb-4">
+                <div class="metric-card">
                     <i class="fas fa-dollar-sign feature-icon"></i>
-                    <h2 class="h1 fw-bold">$50M+</h2>
-                    <p class="lead">Investments Made</p>
+                    <div class="metric-number">₹50M+</div>
+                    <p class="lead mb-0">Investments Made</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="p-4">
+            <div class="col-md-4 mb-4">
+                <div class="metric-card">
                     <i class="fas fa-globe-americas feature-icon"></i>
-                    <h2 class="h1 fw-bold">125K</h2>
-                    <p class="lead">Tons of CO₂ Reduced</p>
+                    <div class="metric-number">125K</div>
+                    <p class="lead mb-0">Tons of CO₂ Reduced</p>
                 </div>
             </div>
         </div>
@@ -52,38 +245,33 @@
 </section>
 
 <!-- How It Works Section -->
-<section id="how-it-works" class="py-5">
+<section class="how-it-works">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">How Ecovest Works</h2>
-                <p class="lead text-muted">We make green investing simple, transparent, and impactful</p>
-            </div>
+        <div class="text-center mb-5">
+            <h2 class="section-title">How Ecovest Works</h2>
+            <p class="section-subtitle">We make green investing simple, transparent, and impactful</p>
         </div>
         <div class="row">
             <div class="col-lg-4 mb-4">
-                <div class="text-center">
-                    <div class="d-inline-block rounded-circle bg-light p-4 mb-4">
-                        <i class="fas fa-search feature-icon"></i>
-                    </div>
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <i class="fas fa-search step-icon"></i>
                     <h3>Discover Opportunities</h3>
                     <p>Browse sustainable initiatives across renewable energy, conservation, and green technology.</p>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
-                <div class="text-center">
-                    <div class="d-inline-block rounded-circle bg-light p-4 mb-4">
-                        <i class="fas fa-hand-holding-usd feature-icon"></i>
-                    </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <i class="fas fa-hand-holding-usd step-icon"></i>
                     <h3>Invest Easily</h3>
                     <p>Choose your investment amount and support projects aligned with your values and goals.</p>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
-                <div class="text-center">
-                    <div class="d-inline-block rounded-circle bg-light p-4 mb-4">
-                        <i class="fas fa-chart-line feature-icon"></i>
-                    </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <i class="fas fa-chart-line step-icon"></i>
                     <h3>Track Impact</h3>
                     <p>Monitor your portfolio's financial performance and environmental impact with AI-powered insights.</p>
                 </div>
@@ -93,27 +281,25 @@
 </section>
 
 <!-- Featured Opportunities Section -->
-<section id="projects" class="py-5 bg-light">
+<section class="featured-section">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">Featured Opportunities</h2>
-                <p class="lead text-muted">Explore high-impact initiatives ready for your investment</p>
-            </div>
+        <div class="text-center mb-5">
+            <h2 class="section-title">Featured Opportunities</h2>
+            <p class="section-subtitle">Explore high-impact initiatives ready for your investment</p>
         </div>
         <div class="row">
             {% for initiative in featured_initiatives %}
                 <div class="col-lg-4 mb-4">
-                    <div class="card project-card h-100">
+                    <div class="project-card">
                         {% if initiative.image %}
                             <img src="{{ initiative.image.url }}" class="card-img-top" alt="{{ initiative.title }}">
                         {% else %}
                             <img src="https://source.unsplash.com/random/600x400/?{{ initiative.categories.first.name|lower }}" class="card-img-top" alt="{{ initiative.title }}">
                         {% endif %}
                         <div class="card-body">
-                            <div class="mb-2">
+                            <div class="mb-3">
                                 {% for category in initiative.categories.all %}
-                                    <span class="badge bg-primary me-1">{{ category.name }}</span>
+                                    <span class="badge bg-success me-1">{{ category.name }}</span>
                                 {% endfor %}
                             </div>
                             <h4 class="card-title">{{ initiative.title }}</h4>
@@ -122,76 +308,69 @@
                                 <span class="text-success fw-bold">
                                     {% widthratio initiative.current_amount initiative.goal_amount 100|floatformat:0 %}% Funded
                                 </span>
-                                <span class="text-muted">Target: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                                <span class="text-muted">Target: ₹{{ initiative.goal_amount|intcomma }}</span>
                             </div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%" aria-valuenow="{% widthratio initiative.current_amount initiative.goal_amount 100 %}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%"></div>
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0">
-                            <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-primary w-100">Invest Now</a>
+                            <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-success w-100">Invest Now</a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
             {% if not featured_initiatives %}
                 <div class="col-12 text-center">
-                    <p>No featured opportunities available at the moment. Check back soon!</p>
+                    <p class="text-muted">No featured opportunities available at the moment. Check back soon!</p>
                 </div>
             {% endif %}
         </div>
         <div class="text-center mt-4">
-            <a href="{% url 'initiative_list' %}" class="btn btn-outline-primary btn-lg">View All Initiatives</a>
+            <a href="{% url 'initiative_list' %}" class="btn btn-outline-success btn-lg">View All Initiatives</a>
         </div>
     </div>
 </section>
 
 <!-- Impact Section -->
-<section id="impact" class="py-5">
+<section class="impact-section">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">Your Investment Impact</h2>
-                <p class="lead text-muted">Track real environmental metrics powered by AI predictions</p>
-            </div>
+        <div class="text-center mb-5">
+            <h2 class="section-title">Your Investment Impact</h2>
+            <p class="section-subtitle">Track real environmental metrics powered by AI predictions</p>
         </div>
         <div class="row">
             <div class="col-md-4 mb-4">
-                <div class="card impact-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-cloud impact-icon mb-4"></i>
-                        <h3>Carbon Emissions</h3>
-                        <p>Track CO₂ reductions predicted by our AI model based on your investments.</p>
-                        <div class="bg-light p-3 rounded mt-3">
-                            <h4 class="mb-0">Avg. Reduction</h4>
-                            <p class="display-6 fw-bold text-success mb-0">42%</p>
-                        </div>
+                <div class="impact-card">
+                    <i class="fas fa-cloud impact-icon"></i>
+                    <h3>Carbon Emissions</h3>
+                    <p>Track CO₂ reductions predicted by our AI model based on your investments.</p>
+                    <div class="bg-light p-3 rounded mt-3">
+                        <h4 class="mb-0">Avg. Reduction</h4>
+                        <p class="display-6 fw-bold text-success mb-0">42%</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card impact-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-bolt impact-icon mb-4"></i>
-                        <h3>Energy Saved</h3>
-                        <p>Measure kWh saved with AI-driven insights from your portfolio.</p>
-                        <div class="bg-light p-3 rounded mt-3">
-                            <h4 class="mb-0">Avg. per ₹1000</h4>
-                            <p class="display-6 fw-bold text-success mb-0">1,200 kWh</p>
-                        </div>
+                <div class="impact-card">
+                    <i class="fas fa-bolt impact-icon"></i>
+                    <h3>Energy Saved</h3>
+                    <p>Measure kWh saved with AI-driven insights from your portfolio.</p>
+                    <div class="bg-light p-3 rounded mt-3">
+                        <h4 class="mb-0">Avg. per ₹1000</h4>
+                        <p class="display-6 fw-bold text-success mb-0">1,200 kWh</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card impact-card h-100">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-tint impact-icon mb-4"></i>
-                        <h3>Water Conserved</h3>
-                        <p>See liters of water conserved, calculated by our advanced AI model.</p>
-                        <div class="bg-light p-3 rounded mt-3">
-                            <h4 class="mb-0">Avg. per ₹1000</h4>
-                            <p class="display-6 fw-bold text-success mb-0">8,500 L</p>
-                        </div>
+                <div class="impact-card">
+                    <i class="fas fa-tint impact-icon"></i>
+                    <h3>Water Conserved</h3>
+                    <p>See liters of water conserved, calculated by our advanced AI model.</p>
+                    <div class="bg-light p-3 rounded mt-3">
+                        <h4 class="mb-0">Avg. per ₹1000</h4>
+                        <p class="display-6 fw-bold text-success mb-0">8,500 L</p>
                     </div>
                 </div>
             </div>
@@ -200,49 +379,47 @@
 </section>
 
 <!-- Testimonials Section -->
-<section class="testimonial">
+<section class="testimonial-section">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-12 text-center">
-                <h2 class="fw-bold">What Our Investors Say</h2>
-                <p class="lead text-muted">Join thousands of satisfied investors making a difference</p>
-            </div>
+        <div class="text-center mb-5">
+            <h2 class="section-title">What Our Investors Say</h2>
+            <p class="section-subtitle">Join thousands of satisfied investors making a difference</p>
         </div>
         <div class="row">
             <div class="col-lg-4 mb-4">
-                <div class="testimonial-card h-100">
+                <div class="testimonial-card">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="{% static 'images/avatar1.jpg' %}" class="rounded-circle me-3" width="60" alt="Investor">
+                        <img src="{% static 'images/avatar1.jpg' %}" class="testimonial-avatar me-3" alt="Investor">
                         <div>
                             <h5 class="mb-0">Sarah Johnson</h5>
                             <p class="text-muted mb-0">Investing since 2022</p>
                         </div>
                     </div>
-                    <p class="mb-0">"Ecovest’s AI insights helped me pick projects with the biggest impact. It’s empowering to see my money at work!"</p>
+                    <p class="mb-0">"Ecovest's AI insights helped me pick projects with the biggest impact. It's empowering to see my money at work!"</p>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
-                <div class="testimonial-card h-100">
+                <div class="testimonial-card">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="{% static 'images/avatar2.jpg' %}" class="rounded-circle me-3" width="60" alt="Investor">
+                        <img src="{% static 'images/avatar2.jpg' %}" class="testimonial-avatar me-3" alt="Investor">
                         <div>
                             <h5 class="mb-0">David Chen</h5>
                             <p class="text-muted mb-0">Investing since 2021</p>
                         </div>
                     </div>
-                    <p class="mb-0">"The platform’s transparency and real-time impact tracking make it a game-changer for green investing."</p>
+                    <p class="mb-0">"The platform's transparency and real-time impact tracking make it a game-changer for green investing."</p>
                 </div>
             </div>
             <div class="col-lg-4 mb-4">
-                <div class="testimonial-card h-100">
+                <div class="testimonial-card">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="https://source.unsplash.com/random/100x100/?portrait,woman,professional" class="rounded-circle me-3" width="60" alt="Investor">
+                        <img src="https://source.unsplash.com/random/100x100/?portrait,woman,professional" class="testimonial-avatar me-3" alt="Investor">
                         <div>
                             <h5 class="mb-0">Maya Patel</h5>
                             <p class="text-muted mb-0">Investing since 2023</p>
                         </div>
                     </div>
-                    <p class="mb-0">"The AI model’s precision makes Ecovest unbeatable for sustainable investing."</p>
+                    <p class="mb-0">"The AI model's precision makes Ecovest unbeatable for sustainable investing."</p>
                 </div>
             </div>
         </div>
@@ -250,21 +427,21 @@
 </section>
 
 <!-- About Section -->
-<section id="about" class="py-5">
+<section class="about-section">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="fw-bold mb-4">About Ecovest</h2>
-                <p class="lead">We’re on a mission to make sustainable investing accessible to everyone.</p>
+                <h2 class="section-title">About Ecovest</h2>
+                <p class="lead">We're on a mission to make sustainable investing accessible to everyone.</p>
                 <p>Founded in 2025, Ecovest connects environmentally conscious investors with vetted sustainable initiatives across renewable energy, conservation, clean water, and green technology sectors.</p>
                 <p>Leveraging an advanced AI model trained on real-world data, we predict the environmental impact of your investments—carbon reduced, energy saved, and water conserved—ensuring transparency and precision. Our team of financial and environmental experts evaluates each opportunity for impact and viability.</p>
                 <div class="mt-4">
-                    <a href="{% url 'learn_more' %}#ourteam" class="btn btn-primary me-2">Our Team</a>
-                    <a href="{% url 'learn_more' %}" class="btn btn-outline-primary">Learn More</a>
+                    <a href="{% url 'learn_more' %}#ourteam" class="btn btn-success me-3">Our Team</a>
+                    <a href="{% url 'learn_more' %}" class="btn btn-outline-success">Learn More</a>
                 </div>
             </div>
             <div class="col-lg-6">
-                <img src="{% static 'images/about.jpg' %}" alt="About Ecovest" class="img-fluid rounded shadow">
+                <img src="{% static 'images/about.jpg' %}" alt="About Ecovest" class="img-fluid about-image">
             </div>
         </div>
     </div>
@@ -274,10 +451,10 @@
 <section class="cta-section">
     <div class="container">
         <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
+            <div class="col-lg-8 cta-content">
                 <h2 class="display-5 fw-bold mb-4">Ready to Start Your Green Investment Journey?</h2>
                 <p class="lead mb-4">Join thousands of investors funding initiatives for profit and planet.</p>
-                <a href="{% url 'register' %}" class="btn btn-light btn-lg me-2 mb-2 mb-md-0">Create Account</a>
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg me-3 mb-2 mb-md-0">Create Account</a>
                 <a href="{% url 'initiative_list' %}" class="btn btn-outline-light btn-lg">Schedule a Demo</a>
             </div>
         </div>
