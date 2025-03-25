@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Initiative, Category
 from investments.models import Investment
-from django.db.models import Q, ExpressionWrapper, F, Sum, FloatField, DecimalField
+from django.db.models import Q, ExpressionWrapper, F, Sum, FloatField, DecimalField, Count
 from django.core.paginator import Paginator
 from django.db.models.functions import Coalesce, Cast
 from django.contrib import messages
@@ -9,110 +9,125 @@ from django.contrib.auth.decorators import login_required
 from .forms import InitiativeForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from investments.impact_calculator import ImpactCalculator
 
 def initiative_list(request):
     initiatives = Initiative.objects.all()
-    categories = Category.objects.all()
-
-    # Filter by category
+    
+    # Apply filters
     category = request.GET.get('category')
+    status = request.GET.get('status')
+    search = request.GET.get('search')
+    sort = request.GET.get('sort', 'newest')
+    
     if category:
         initiatives = initiatives.filter(categories__name=category)
-
-    # Filter by status
-    status = request.GET.get('status')
     if status:
         initiatives = initiatives.filter(status=status)
-
-    # Filter by search
-    search = request.GET.get('search')
     if search:
-        initiatives = initiatives.filter(
-            Q(title__icontains=search) |
-            Q(description__icontains=search) |
-            Q(location__icontains=search)
-        )
-
-    # Sort initiatives
-    sort = request.GET.get('sort', 'newest')
-    if sort == 'newest':
-        initiatives = initiatives.order_by('-created_at')
-    elif sort == 'progress':
-        initiatives = initiatives.annotate(
-            progress=ExpressionWrapper(
-                Cast('current_amount', FloatField()) * 100.0 / Cast('goal_amount', FloatField()),
-                output_field=FloatField()
-            )
-        ).order_by('-progress')
-    elif sort == 'amount':
+        initiatives = initiatives.filter(title__icontains=search)
+    
+    # Apply sorting
+    if sort == 'progress':
         initiatives = initiatives.order_by('-current_amount')
-
-    # Calculate totals for hero section
-    active_initiatives = initiatives.filter(status='active')
-    total_initiatives = active_initiatives.count()
-    total_investors = Investment.objects.values('user').distinct().count()
-    total_invested = initiatives.aggregate(
-        total=Coalesce(Sum('current_amount'), 0, output_field=DecimalField())
-    )['total']
-    total_carbon = initiatives.aggregate(
-        total=Coalesce(Sum('carbon_impact'), 0, output_field=FloatField())
-    )['total']
-    total_energy = initiatives.aggregate(
-        total=Coalesce(Sum('energy_impact'), 0, output_field=FloatField())
-    )['total']
-    total_water = initiatives.aggregate(
-        total=Coalesce(Sum('water_impact'), 0, output_field=FloatField())
-    )['total']
-
+    elif sort == 'amount':
+        initiatives = initiatives.order_by('-goal_amount')
+    else:  # newest
+        initiatives = initiatives.order_by('-created_at')
+    
+    # Calculate total metrics
+    total_initiatives = Initiative.objects.count()
+    total_investors = Initiative.objects.aggregate(total=Count('investments__user', distinct=True))['total']
+    total_invested = Initiative.objects.aggregate(total=Sum('current_amount'))['total'] or 0
+    
+    # Initialize impact calculator
+    impact_calculator = ImpactCalculator()
+    
+    # Calculate impact for ₹1000 for each initiative
+    for initiative in initiatives:
+        # Get category names
+        category_names = [cat.name for cat in initiative.categories.all()]
+        
+        # Calculate impact for ₹1000
+        carbon, energy, water = impact_calculator.predict_impact(
+            investment_amount=1000,
+            category_names=category_names,
+            project_duration_months=initiative.duration_months,
+            project_scale=initiative.project_scale,
+            location=initiative.location,
+            technology_type=initiative.technology_type
+        )
+        
+        # Store the impact metrics
+        initiative.impact_for_1000 = {
+            'carbon': round(carbon),
+            'energy': round(energy),
+            'water': round(water)
+        }
+    
+    # Calculate total carbon impact
+    total_carbon = sum(initiative.impact_for_1000['carbon'] for initiative in initiatives)
+    
     # Pagination
-    paginator = Paginator(initiatives, 9)  # Show 9 initiatives per page
+    paginator = Paginator(initiatives, 9)
     page = request.GET.get('page')
     initiatives = paginator.get_page(page)
-
+    
     context = {
         'initiatives': initiatives,
-        'categories': categories,
+        'categories': Category.objects.all(),
         'total_initiatives': total_initiatives,
         'total_investors': total_investors,
         'total_invested': total_invested,
         'total_carbon': total_carbon,
-        'total_energy': total_energy,
-        'total_water': total_water,
     }
+    
     return render(request, 'initiatives/initiative_list.html', context)
 
 def initiative_detail(request, pk):
     initiative = get_object_or_404(Initiative, pk=pk)
     
-    # Get recent investments
-    recent_investments = Investment.objects.filter(
-        initiative=initiative
-    ).select_related('user').order_by('-created_at')[:5]
+    # Initialize impact calculator
+    impact_calculator = ImpactCalculator()
     
-    # Get similar initiatives based on categories
+    # Get category names
+    category_names = [cat.name for cat in initiative.categories.all()]
+    
+    # Calculate impact for ₹1000
+    carbon, energy, water = impact_calculator.predict_impact(
+        investment_amount=1000,
+        category_names=category_names,
+        project_duration_months=initiative.duration_months,
+        project_scale=initiative.project_scale,
+        location=initiative.location,
+        technology_type=initiative.technology_type
+    )
+    
+    # Store the impact metrics
+    impact_metrics = {
+        'carbon': round(carbon),
+        'energy': round(energy),
+        'water': round(water)
+    }
+    
+    # Get recent investments
+    recent_investments = initiative.investments.all().order_by('-created_at')[:5]
+    
+    # Get similar initiatives
     similar_initiatives = Initiative.objects.filter(
         categories__in=initiative.categories.all()
-    ).exclude(id=initiative.id).distinct()[:3]
-
-    # Calculate total investments and investors for this initiative
-    total_investors = Investment.objects.filter(
-        initiative=initiative
-    ).values('user').distinct().count()
-
-    # Calculate impact metrics
-    impact_metrics = {
-        'carbon': initiative.carbon_impact or 0,
-        'energy': initiative.energy_impact or 0,
-        'water': initiative.water_impact or 0,
-    }
-
+    ).exclude(
+        pk=initiative.pk
+    ).distinct()[:3]
+    
     context = {
         'initiative': initiative,
+        'impact_metrics': impact_metrics,
         'recent_investments': recent_investments,
         'similar_initiatives': similar_initiatives,
-        'total_investors': total_investors,
-        'impact_metrics': impact_metrics,
+        'total_investors': initiative.investments.values('user').distinct().count(),
     }
+    
     return render(request, 'initiatives/initiative_detail.html', context)
 
 @login_required

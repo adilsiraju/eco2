@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %}Invest in {{ initiative.title }} - Ecovest{% endblock %}
 
 {% block extra_css %}
@@ -110,8 +111,8 @@
                                  style="width: {% widthratio initiative.current_amount initiative.goal_amount 100 %}%"></div>
                         </div>
                         <div class="d-flex justify-content-between text-white-50">
-                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2 }}</span>
-                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2|intcomma }}</span>
+                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2|intcomma }}</span>
                         </div>
                     </div>
                 </div>
@@ -251,9 +252,9 @@ document.getElementById('amount').addEventListener('input', function(e) {
     const fee = amount * 0.02;
     const total = amount + fee;
     
-    document.getElementById('summaryAmount').textContent = `₹${amount.toFixed(2)}`;
-    document.getElementById('summaryFee').textContent = `₹${fee.toFixed(2)}`;
-    document.getElementById('summaryTotal').textContent = `₹${total.toFixed(2)}`;
+    document.getElementById('summaryAmount').textContent = `₹${amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('summaryFee').textContent = `₹${fee.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('summaryTotal').textContent = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 });
 
 document.getElementById('investmentForm').addEventListener('submit', function(e) {

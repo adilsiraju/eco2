@@ -159,8 +159,8 @@
                                  style="width: {{ initiative.get_progress_percentage }}%"></div>
                         </div>
                         <div class="d-flex justify-content-between text-white-50 mb-4">
-                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2 }}</span>
-                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2 }}</span>
+                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2|intcomma }}</span>
+                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2|intcomma }}</span>
                         </div>
                         <div class="d-grid">
                             <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-light btn-lg">
@@ -209,6 +209,9 @@
                         <p class="text-muted mb-0">Water Conserved</p>
                     </div>
                 </div>
+            </div>
+            <div class="text-muted small text-center mb-4">
+                Estimated impact for a ₹1,000 investment over {{ initiative.duration_months }} months
             </div>
 
             <!-- Project Stats -->
@@ -293,7 +296,7 @@
                             {% endif %}
                             <div>
                                 <h6 class="mb-0">{{ investment.user.get_full_name }}</h6>
-                                <small class="text-muted">Invested ₹{{ investment.amount|floatformat:2 }}</small>
+                                <small class="text-muted">Invested ₹{{ investment.amount|floatformat:2|intcomma }}</small>
                             </div>
                             <small class="text-muted ms-auto">{{ investment.created_at|timesince }} ago</small>
                         </div>
@@ -360,7 +363,7 @@
                                     {% endif %}
                                     <div>
                                         <h6 class="mb-1">{{ similar.title }}</h6>
-                                        <small class="text-muted">₹{{ similar.current_amount|floatformat:0 }} raised</small>
+                                        <small class="text-muted">₹{{ similar.current_amount|floatformat:0|intcomma }} raised</small>
                                     </div>
                                 </div>
                             </a>

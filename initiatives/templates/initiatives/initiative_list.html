@@ -72,8 +72,12 @@
         overflow: hidden;
     }
     .progress {
-        height: 8px;
+        height: 15px;
         margin-bottom: 1rem;
+        border-radius: 6px;
+    }
+    .progress-bar {
+        border-radius: 6px;
     }
     .impact-stats {
         display: flex;
@@ -235,16 +239,19 @@
                     <div class="impact-stats">
                         <div class="impact-stat">
                             <i class="fas fa-cloud"></i>
-                            {{ initiative.carbon_impact|intcomma }} kg
+                            {{ initiative.impact_for_1000.carbon|intcomma }} kg
                         </div>
                         <div class="impact-stat">
                             <i class="fas fa-bolt"></i>
-                            {{ initiative.energy_impact|intcomma }} kWh
+                            {{ initiative.impact_for_1000.energy|intcomma }} kWh
                         </div>
                         <div class="impact-stat">
                             <i class="fas fa-tint"></i>
-                            {{ initiative.water_impact|intcomma }} L
+                            {{ initiative.impact_for_1000.water|intcomma }} L
                         </div>
+                    </div>
+                    <div class="text-muted small mb-2">
+                        Impact per ₹1,000 investment
                     </div>
                     
                     <div class="initiative-footer">
