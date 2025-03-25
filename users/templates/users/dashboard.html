@@ -2,6 +2,26 @@
 {% load static %}
 {% load investment_tags %}
 {% block title %}Your Dashboard - Ecovest{% endblock %}
+
+{% block extra_css %}
+<style>
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+.chart-container.large {
+    height: 400px;
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
@@ -98,6 +118,53 @@
     </div>
 </section>
 
+<!-- Charts Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-12 text-center">
+                <h2 class="fw-bold">Investment Analytics</h2>
+                <p class="lead text-muted">Visual insights into your sustainable investments</p>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Investment Distribution Chart -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Investment Distribution by Category</h5>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Monthly Investment Trends -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Monthly Investment Trends</h5>
+                        <div class="chart-container">
+                            <canvas id="trendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Impact Metrics Chart -->
+            <div class="col-md-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Impact Metrics Over Time</h5>
+                        <div class="chart-container large">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Initiative Holdings Section -->
 <section class="py-5">
     <div class="container">
@@ -144,4 +211,137 @@
         {% endif %}
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse the JSON data safely
+    const categoryData = JSON.parse('{{ category_investments|escapejs }}');
+    const monthlyData = JSON.parse('{{ monthly_investments|escapejs }}');
+
+    // Category Distribution Chart
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categoryData.map(item => item.initiative__categories__name || 'Uncategorized'),
+            datasets: [{
+                data: categoryData.map(item => item.total_amount || 0),
+                backgroundColor: [
+                    '#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6610f2',
+                    '#20c997', '#e83e8c', '#fd7e14', '#6f42c1', '#007bff'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `₹${context.raw.toLocaleString()}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Monthly Investment Trends Chart
+    new Chart(document.getElementById('trendsChart'), {
+        type: 'line',
+        data: {
+            labels: monthlyData.map(item => {
+                const date = new Date(item.month);
+                return date.toLocaleDateString('default', { month: 'short', year: 'numeric' });
+            }),
+            datasets: [{
+                label: 'Investment Amount (₹)',
+                data: monthlyData.map(item => item.total_amount || 0),
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `₹${context.raw.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Impact Metrics Chart
+    new Chart(document.getElementById('impactChart'), {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(item => {
+                const date = new Date(item.month);
+                return date.toLocaleDateString('default', { month: 'short', year: 'numeric' });
+            }),
+            datasets: [{
+                label: 'Carbon Reduced (kg)',
+                data: monthlyData.map(item => item.total_carbon_reduced || 0),
+                backgroundColor: '#28a745'
+            }, {
+                label: 'Energy Saved (kWh)',
+                data: monthlyData.map(item => item.total_energy_saved || 0),
+                backgroundColor: '#ffc107'
+            }, {
+                label: 'Water Conserved (L)',
+                data: monthlyData.map(item => item.total_water_conserved || 0),
+                backgroundColor: '#17a2b8'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
