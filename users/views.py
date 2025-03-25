@@ -52,7 +52,9 @@ def dashboard(request):
     # Initialize category impact dictionary
     impact_by_category = defaultdict(lambda: {'carbon': 0, 'energy': 0, 'water': 0})
     
-    for investment in investments:
+    # Get recent investments and calculate their impact
+    recent_investments = investments.order_by('-created_at')[:5]
+    for investment in recent_investments:
         # Get category names for the initiative
         category_names = [cat.name for cat in investment.initiative.categories.all()]
         
@@ -65,6 +67,13 @@ def dashboard(request):
             location=investment.initiative.location,
             technology_type=investment.initiative.technology_type
         )
+        
+        # Store the impact metrics in the investment object
+        investment.impact_metrics = {
+            'carbon': round(carbon),
+            'energy': round(energy),
+            'water': round(water)
+        }
         
         # Add to total impact
         total_impact['carbon'] += carbon
@@ -102,9 +111,6 @@ def dashboard(request):
             'energy': round(impact_by_category[category]['energy']),
             'water': round(impact_by_category[category]['water'])
         }
-    
-    # Get recent investments
-    recent_investments = investments.order_by('-created_at')[:5]
     
     # Get investment distribution by category
     category_distribution = investments.values(

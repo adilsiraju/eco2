@@ -194,15 +194,15 @@
                         <div class="impact-stats">
                             <div class="impact-stat">
                                 <i class="fas fa-cloud"></i>
-                                {{ investment.initiative.carbon_impact|floatformat:0|intcomma }} kg
+                                {{ investment.impact_metrics.carbon|floatformat:0|intcomma }} kg
                             </div>
                             <div class="impact-stat">
                                 <i class="fas fa-bolt"></i>
-                                {{ investment.initiative.energy_impact|floatformat:0|intcomma }} kWh
+                                {{ investment.impact_metrics.energy|floatformat:0|intcomma }} kWh
                             </div>
                             <div class="impact-stat">
                                 <i class="fas fa-tint"></i>
-                                {{ investment.initiative.water_impact|floatformat:0|intcomma }} L
+                                {{ investment.impact_metrics.water|floatformat:0|intcomma }} L
                             </div>
                         </div>
                         
