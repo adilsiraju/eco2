@@ -144,7 +144,26 @@ footer {
 }
 
 .card-img-top {
-    height: 200px; /* Fixed height */
-    width: 100%;   /* Full width of the card */
-    object-fit: cover; /* Crops image to fit while maintaining aspect ratio */
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.initiative-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.initiative-card:hover {
+    transform: translateY(-5px);
+}
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 2px solid #ddd;
 }
