@@ -179,35 +179,41 @@
     <div class="dashboard-card">
         <h2 class="mb-4">Recent Investments</h2>
         <div class="row g-4">
-            {% for investment in recent_investments %}
+            {% for investment_data in recent_investments %}
             <div class="col-md-4">
                 <div class="investment-card">
-                    {% if investment.initiative.image %}
-                    <img src="{{ investment.initiative.image.url }}" alt="{{ investment.initiative.title }}" class="investment-image">
+                    {% if investment_data.initiative.image %}
+                    <img src="{{ investment_data.initiative.image.url }}" alt="{{ investment_data.initiative.title }}" class="investment-image">
                     {% else %}
                     <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="investment-image">
                     {% endif %}
                     <div class="investment-content">
-                        <h3 class="investment-title">{{ investment.initiative.title }}</h3>
-                        <div class="investment-amount">₹{{ investment.amount|intcomma }}</div>
+                        <h3 class="investment-title">{{ investment_data.initiative.title }}</h3>
+                        <div class="investment-amount">₹{{ investment_data.total_amount|intcomma }}</div>
                         
                         <div class="impact-stats">
                             <div class="impact-stat">
                                 <i class="fas fa-cloud"></i>
-                                {{ investment.impact_metrics.carbon|floatformat:0|intcomma }} kg
+                                {{ investment_data.impact_metrics.carbon|floatformat:0|intcomma }} kg
                             </div>
                             <div class="impact-stat">
                                 <i class="fas fa-bolt"></i>
-                                {{ investment.impact_metrics.energy|floatformat:0|intcomma }} kWh
+                                {{ investment_data.impact_metrics.energy|floatformat:0|intcomma }} kWh
                             </div>
                             <div class="impact-stat">
                                 <i class="fas fa-tint"></i>
-                                {{ investment.impact_metrics.water|floatformat:0|intcomma }} L
+                                {{ investment_data.impact_metrics.water|floatformat:0|intcomma }} L
                             </div>
                         </div>
                         
                         <div class="text-muted small">
-                            <i class="fas fa-calendar"></i> {{ investment.created_at|date:"M d, Y" }}
+                            <i class="fas fa-calendar"></i> {{ investment_data.last_investment_date|date:"M d, Y" }}
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'user_initiative_detail' investment_data.initiative.id %}" class="btn btn-outline-success btn-sm">
+                                View Details
+                            </a>
                         </div>
                     </div>
                 </div>

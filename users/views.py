@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
@@ -52,24 +52,46 @@ def dashboard(request):
     # Initialize category impact dictionary
     impact_by_category = defaultdict(lambda: {'carbon': 0, 'energy': 0, 'water': 0})
     
-    # Get recent investments and calculate their impact
-    recent_investments = investments.order_by('-created_at')[:5]
-    for investment in recent_investments:
+    # Group investments by initiative and calculate total amount and impact
+    grouped_investments = {}
+    for investment in investments:
+        initiative_id = investment.initiative.id
+        if initiative_id not in grouped_investments:
+            grouped_investments[initiative_id] = {
+                'initiative': investment.initiative,
+                'total_amount': 0,
+                'last_investment_date': investment.created_at,
+                'impact_metrics': {'carbon': 0, 'energy': 0, 'water': 0}
+            }
+        
+        grouped_investments[initiative_id]['total_amount'] += investment.amount
+    
+    # Get recent investments (based on last investment date) and calculate their impact
+    recent_investments = sorted(
+        grouped_investments.values(),
+        key=lambda x: x['last_investment_date'],
+        reverse=True
+    )[:5]
+    
+    for investment_data in recent_investments:
+        initiative = investment_data['initiative']
+        total_amount = investment_data['total_amount']
+        
         # Get category names for the initiative
-        category_names = [cat.name for cat in investment.initiative.categories.all()]
+        category_names = [cat.name for cat in initiative.categories.all()]
         
         # Calculate impact for this investment
         carbon, energy, water = impact_calculator.predict_impact(
-            investment_amount=float(investment.amount),
+            investment_amount=float(total_amount),
             category_names=category_names,
-            project_duration_months=investment.initiative.duration_months,
-            project_scale=investment.initiative.project_scale,
-            location=investment.initiative.location,
-            technology_type=investment.initiative.technology_type
+            project_duration_months=initiative.duration_months,
+            project_scale=initiative.project_scale,
+            location=initiative.location,
+            technology_type=initiative.technology_type
         )
         
-        # Store the impact metrics in the investment object
-        investment.impact_metrics = {
+        # Store the impact metrics
+        investment_data['impact_metrics'] = {
             'carbon': round(carbon),
             'energy': round(energy),
             'water': round(water)
@@ -84,12 +106,12 @@ def dashboard(request):
         for category_name in category_names:
             # Calculate impact for this category
             cat_carbon, cat_energy, cat_water = impact_calculator.predict_impact(
-                investment_amount=float(investment.amount),
+                investment_amount=float(total_amount),
                 category_names=[category_name],  # Calculate impact for this category only
-                project_duration_months=investment.initiative.duration_months,
-                project_scale=investment.initiative.project_scale,
-                location=investment.initiative.location,
-                technology_type=investment.initiative.technology_type
+                project_duration_months=initiative.duration_months,
+                project_scale=initiative.project_scale,
+                location=initiative.location,
+                technology_type=initiative.technology_type
             )
             
             # Add to category totals
@@ -182,3 +204,49 @@ def profile(request):
         'profile_form': profile_form,
     }
     return render(request, 'users/profile.html', context)
+
+@login_required
+def user_initiative_detail(request, pk):
+    initiative = get_object_or_404(Initiative, pk=pk)
+    user_investments = request.user.investments.filter(initiative=initiative)
+    
+    # Calculate total invested amount
+    total_invested = user_investments.aggregate(
+        total=Coalesce(Sum('amount'), 0, output_field=DecimalField())
+    )['total']
+    
+    # Initialize impact calculator
+    impact_calculator = ImpactCalculator()
+    
+    # Get category names
+    category_names = [cat.name for cat in initiative.categories.all()]
+    
+    # Calculate impact for total investment
+    carbon, energy, water = impact_calculator.predict_impact(
+        investment_amount=float(total_invested),
+        category_names=category_names,
+        project_duration_months=initiative.duration_months,
+        project_scale=initiative.project_scale,
+        location=initiative.location,
+        technology_type=initiative.technology_type
+    )
+    
+    # Store the impact metrics
+    impact_metrics = {
+        'carbon': round(carbon),
+        'energy': round(energy),
+        'water': round(water)
+    }
+    
+    # Get investment history
+    investment_history = user_investments.order_by('-created_at')
+    
+    context = {
+        'initiative': initiative,
+        'total_invested': total_invested,
+        'impact_metrics': impact_metrics,
+        'investment_history': investment_history,
+        'total_investors': initiative.investments.values('user').distinct().count(),
+    }
+    
+    return render(request, 'users/user_initiative_detail.html', context)
