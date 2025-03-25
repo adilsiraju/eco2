@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.db import models
 from django.core.validators import MinValueValidator
 from investments.portfolio_analyzer import PortfolioAnalyzer
@@ -99,6 +100,13 @@ class Initiative(models.Model):
         if self.goal_amount == 0:
             return 0
         return (self.current_amount / self.goal_amount) * 100
+    
+    @property
+    def end_date(self):
+        """Calculate the estimated end date based on created_at and duration_months"""
+        if not self.created_at or not self.duration_months:
+            return None
+        return self.created_at + timedelta(days=self.duration_months*30)  # Approximate 30 days
 
     class Meta:
         ordering = ['-created_at']

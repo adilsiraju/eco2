@@ -271,12 +271,24 @@
                     </div>
                     <div class="timeline-item">
                         <h5>First Milestone</h5>
-                        <p class="text-muted">Expected: {{ initiative.created_at|date:"F d, Y" }}</p>
+                        <p class="text-muted">
+                            {% if initiative.end_date %}
+                                Expected: {{ initiative.created_at|date:"F d, Y" }}
+                            {% else %}
+                                TBD
+                            {% endif %}
+                        </p>
                         <p>Initial implementation and setup phase.</p>
                     </div>
                     <div class="timeline-item">
                         <h5>Project Completion</h5>
-                        <p class="text-muted">Expected: {{ initiative.end_date|date:"F d, Y" }}</p>
+                        <p class="text-muted">
+                            {% if initiative.end_date %}
+                                Expected: {{ initiative.end_date|date:"F d, Y" }}
+                            {% else %}
+                                TBD
+                            {% endif %}
+                        </p>
                         <p>Final implementation and impact assessment.</p>
                     </div>
                 </div>
