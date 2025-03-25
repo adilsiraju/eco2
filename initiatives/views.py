@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from .models import Initiative, Category
 from investments.models import Investment
 from django.db.models import Q, ExpressionWrapper, F, Sum, FloatField, DecimalField, Count
