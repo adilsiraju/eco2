@@ -4,7 +4,6 @@ from initiatives.models import Initiative
 from django.db.models import Sum
 from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
-
 from investments.impact_calculator import ImpactCalculator
 
 User = get_user_model()
@@ -36,6 +35,27 @@ class Investment(models.Model):
             project_scale=self.initiative.project_scale,
             location=self.initiative.location,
             technology_type=self.initiative.technology_type
+        )
+        
+        return {
+            'carbon': carbon,
+            'energy': energy,
+            'water': water
+        }
+    
+    @staticmethod
+    def calculate_impact_for_amount(initiative, amount):
+        """Calculate hypothetical impact for a given amount and initiative without instantiation"""
+        calculator = ImpactCalculator()
+        categories = [cat.name for cat in initiative.categories.all()]
+        
+        carbon, energy, water = calculator.predict_impact(
+            investment_amount=float(amount),
+            category_names=categories,
+            project_duration_months=initiative.duration_months,
+            project_scale=initiative.project_scale,
+            location=initiative.location,
+            technology_type=initiative.technology_type
         )
         
         return {
@@ -93,21 +113,18 @@ class InvestmentGoal(models.Model):
                 'energy': float((profile.energy_saved / self.target_energy * 100) if self.target_energy else 0),
                 'water': float((profile.water_conserved / self.target_water * 100) if self.target_water else 0)
             }
-            # Return average progress for impact goals
             return sum(progress.values()) / len(progress)
         elif self.goal_type == 'diversity':
             from investments.portfolio_analyzer import PortfolioAnalyzer
             analyzer = PortfolioAnalyzer()
             analysis = analyzer.get_diversification_recommendations(self.user)
             
-            # Calculate diversity score based on distribution
             category_dist = analysis['category_distribution']
             tech_dist = analysis['technology_distribution']
             
             if not category_dist or not tech_dist:
                 return 0
                 
-            # Calculate how well distributed the portfolio is
             category_score = 100 - max(category_dist.values()) if category_dist else 0
             tech_score = 100 - max(tech_dist.values()) if tech_dist else 0
             

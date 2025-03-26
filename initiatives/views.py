@@ -38,11 +38,10 @@ def initiative_list(request):
     total_investors = Initiative.objects.aggregate(total=Count('investments__user', distinct=True))['total']
     total_invested = Initiative.objects.aggregate(total=Sum('current_amount'))['total'] or 0
     
-    # Calculate impact for ₹1000
+    # Calculate impact for ₹1000 using static method
     total_carbon = 0
     for initiative in initiatives:
-        mock_investment = Investment(amount=1000, initiative=initiative)
-        impact = mock_investment.calculate_impact()  # Hypothetical calculation
+        impact = Investment.calculate_impact_for_amount(initiative, 1000)
         initiative.impact_for_1000 = {k: round(v) for k, v in impact.items()}
         total_carbon += initiative.impact_for_1000['carbon']
     
@@ -64,9 +63,8 @@ def initiative_list(request):
 def initiative_detail(request, pk):
     initiative = get_object_or_404(Initiative, pk=pk)
     
-    # Calculate impact for ₹1000
-    mock_investment = Investment(amount=1000, initiative=initiative)
-    impact_metrics = mock_investment.calculate_impact()
+    # Calculate impact for ₹1000 using static method
+    impact_metrics = Investment.calculate_impact_for_amount(initiative, 1000)
     impact_metrics = {k: round(v) for k, v in impact_metrics.items()}
     
     # Get recent investments
@@ -85,37 +83,3 @@ def initiative_detail(request, pk):
         'total_investors': initiative.investments.values('user').distinct().count(),
     }
     return render(request, 'initiatives/initiative_detail.html', context)
-
-@login_required
-def create_initiative(request):
-    if request.method == 'POST':
-        form = InitiativeForm(request.POST, request.FILES)
-        if form.is_valid():
-            initiative = form.save(commit=False)
-            
-            # Simplified impact calculation (unchanged)
-            base_carbon_reduction = 1000  # kg CO2 per 100,000 INR
-            base_energy_savings = 5000    # kWh per 100,000 INR
-            base_water_savings = 10000    # liters per 100,000 INR
-            
-            initiative.carbon_reduction_per_investment = base_carbon_reduction / 100
-            initiative.energy_savings_per_investment = base_energy_savings / 100
-            initiative.water_savings_per_investment = base_water_savings / 100
-            
-            goal_amount_float = float(initiative.goal_amount)
-            initiative.carbon_impact = (goal_amount_float / 100000) * base_carbon_reduction
-            initiative.energy_impact = (goal_amount_float / 100000) * base_energy_savings
-            initiative.water_impact = (goal_amount_float / 100000) * base_water_savings
-            
-            initiative.current_amount = 0
-            initiative.status = 'active'
-            initiative.risk_level = 'medium'
-            initiative.roi_estimate = 12.0
-            
-            initiative.save()
-            form.save_m2m()
-            messages.success(request, 'Initiative created successfully!')
-            return redirect('initiative_detail', pk=initiative.pk)
-    else:
-        form = InitiativeForm()
-    return render(request, 'initiatives/create_initiative.html', {'form': form})
