@@ -35,11 +35,6 @@ class InitiativeAdmin(admin.ModelAdmin):
         ('Financial Details', {
             'fields': ('goal_amount', 'current_amount', 'min_investment', 'max_investment', 'roi_estimate')
         }),
-        ('Impact Metrics', {
-            'fields': ('carbon_impact', 'energy_impact', 'water_impact', 
-                      'carbon_reduction_per_investment', 'energy_savings_per_investment', 
-                      'water_savings_per_investment')
-        }),
         ('Project Details', {
             'fields': ('project_scale', 'risk_level', 'duration_months')
         }),
