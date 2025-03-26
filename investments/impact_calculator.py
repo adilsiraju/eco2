@@ -166,20 +166,21 @@ class ImpactCalculator:
             pickle.dump(self.scaler, f)
 
     def load_or_train_model(self):
-        if (os.path.exists(self.model_file_carbon) and
-            os.path.exists(self.model_file_energy) and
-            os.path.exists(self.model_file_water) and
-            os.path.exists(self.scaler_file)):  # Check scaler file too
-            with open(self.model_file_carbon, 'rb') as f:
-                self.model_carbon = pickle.load(f)
-            with open(self.model_file_energy, 'rb') as f:
-                self.model_energy = pickle.load(f)
-            with open(self.model_file_water, 'rb') as f:
-                self.model_water = pickle.load(f)
-            with open(self.scaler_file, 'rb') as f:  # Load scaler
-                self.scaler = pickle.load(f)
-        else:
-            self.train_model()
+        def __init__(self):
+            if (os.path.exists(self.model_file_carbon) and
+                os.path.exists(self.model_file_energy) and
+                os.path.exists(self.model_file_water) and
+                os.path.exists(self.scaler_file)):  # Check scaler file too
+                with open(self.model_file_carbon, 'rb') as f:
+                    self.model_carbon = pickle.load(f)
+                with open(self.model_file_energy, 'rb') as f:
+                    self.model_energy = pickle.load(f)
+                with open(self.model_file_water, 'rb') as f:
+                    self.model_water = pickle.load(f)
+                with open(self.scaler_file, 'rb') as f:  # Load scaler
+                    self.scaler = pickle.load(f)
+            else:
+                self.train_model()
 
     def predict_impact(self, investment_amount, category_names, project_duration_months=12, project_scale=1, location='North India', technology_type=None):
         investment_amount = float(investment_amount)
