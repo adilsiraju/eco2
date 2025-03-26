@@ -5,6 +5,8 @@ from django.db.models import Sum
 from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
 
+from investments.impact_calculator import ImpactCalculator
+
 User = get_user_model()
 
 class Investment(models.Model):
@@ -22,16 +24,38 @@ class Investment(models.Model):
     def __str__(self):
         return f"{self.user.username}'s investment in {self.initiative.title}"
     
+    def calculate_impact(self):
+        """Centralized impact calculation using AI model"""
+        calculator = ImpactCalculator()
+        categories = [cat.name for cat in self.initiative.categories.all()]
+        
+        carbon, energy, water = calculator.predict_impact(
+            investment_amount=float(self.amount),
+            category_names=categories,
+            project_duration_months=self.initiative.duration_months,
+            project_scale=self.initiative.project_scale,
+            location=self.initiative.location,
+            technology_type=self.initiative.technology_type
+        )
+        
+        return {
+            'carbon': carbon,
+            'energy': energy,
+            'water': water
+        }
+    
     def save(self, *args, **kwargs):
-        # Calculate impact metrics based on amount and initiative's per-investment values
-        self.carbon_impact = float(self.amount) * self.initiative.carbon_reduction_per_investment
-        self.energy_impact = float(self.amount) * self.initiative.energy_savings_per_investment
-        self.water_impact = float(self.amount) * self.initiative.water_savings_per_investment
+        # Calculate impacts using centralized method
+        impacts = self.calculate_impact()
+        self.carbon_impact = impacts['carbon']
+        self.energy_impact = impacts['energy']
+        self.water_impact = impacts['water']
         
-        # Update initiative's current amount
-        self.initiative.current_amount += self.amount
-        self.initiative.save()
-        
+        # Update initiative amount if new investment
+        if not self.pk:
+            self.initiative.current_amount += self.amount
+            self.initiative.save()
+            
         super().save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
