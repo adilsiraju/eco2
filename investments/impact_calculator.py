@@ -16,12 +16,16 @@ class ImpactCalculator:
         self.model_file_carbon = os.path.join(settings.BASE_DIR, 'investments/models/carbon_model.pkl')
         self.model_file_energy = os.path.join(settings.BASE_DIR, 'investments/models/energy_model.pkl')
         self.model_file_water = os.path.join(settings.BASE_DIR, 'investments/models/water_model.pkl')
-        self.scaler_file = os.path.join(settings.BASE_DIR, 'investments/models/scaler.pkl')  # New scaler file
+        self.scaler_file = os.path.join(settings.BASE_DIR, 'investments/models/scaler.pkl')
         self.categories = [
             'Renewable Energy', 'Recycling', 'Emission Control', 'Water Conservation',
             'Reforestation', 'Sustainable Agriculture', 'Clean Transportation',
             'Waste Management', 'Green Technology', 'Ocean Conservation'
         ]
+        # Fit label encoders once during initialization
+        self.label_encoder_location.fit(['North India', 'South India', 'East India', 'West India'])
+        self.label_encoder_technology.fit(['Solar', 'Wind', 'Hydro', 'Organic', 'Mechanical', 'Chemical', 'Biofuel', 'EV', 'Manual', 'AI'])
+        # Load or train models and scaler
         self.load_or_train_model()
 
     def train_model(self):
@@ -166,29 +170,28 @@ class ImpactCalculator:
             pickle.dump(self.scaler, f)
 
     def load_or_train_model(self):
-        def __init__(self):
-            if (os.path.exists(self.model_file_carbon) and
-                os.path.exists(self.model_file_energy) and
-                os.path.exists(self.model_file_water) and
-                os.path.exists(self.scaler_file)):  # Check scaler file too
+        try:
+            # Check if all necessary files exist
+            if all(os.path.exists(f) for f in [self.model_file_carbon, self.model_file_energy, self.model_file_water, self.scaler_file]):
                 with open(self.model_file_carbon, 'rb') as f:
                     self.model_carbon = pickle.load(f)
                 with open(self.model_file_energy, 'rb') as f:
                     self.model_energy = pickle.load(f)
                 with open(self.model_file_water, 'rb') as f:
                     self.model_water = pickle.load(f)
-                with open(self.scaler_file, 'rb') as f:  # Load scaler
+                with open(self.scaler_file, 'rb') as f:
                     self.scaler = pickle.load(f)
             else:
+                print("One or more model/scaler files missing. Training new models...")
                 self.train_model()
+        except Exception as e:
+            print(f"Failed to load models or scaler: {e}. Training new models...")
+            self.train_model()
 
     def predict_impact(self, investment_amount, category_names, project_duration_months=12, project_scale=1, location='North India', technology_type=None):
         investment_amount = float(investment_amount)
         locations = ['North India', 'South India', 'East India', 'West India']
         technologies = ['Solar', 'Wind', 'Hydro', 'Organic', 'Mechanical', 'Chemical', 'Biofuel', 'EV', 'Manual', 'AI']
-
-        self.label_encoder_location.fit(locations)
-        self.label_encoder_technology.fit(technologies)
 
         location_map = {'India': 'North India', 'North America': 'West India'}
         mapped_location = location_map.get(location, location if location in locations else 'North India')
@@ -205,7 +208,7 @@ class ImpactCalculator:
         X = np.array([[investment_amount] + category_vector + [project_duration_months, project_scale, location_encoded, technology_encoded]])
         X_transformed = X.copy()
         X_transformed[:, 0] = np.log1p(X[:, 0])
-        X_transformed = self.scaler.transform(X_transformed)
+        X_transformed = self.scaler.transform(X_transformed)  # This line requires a fitted scaler
 
         carbon_reduced = max(0, self.model_carbon.predict(X_transformed)[0])
         energy_saved = max(0, self.model_energy.predict(X_transformed)[0])

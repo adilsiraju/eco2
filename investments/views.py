@@ -5,8 +5,10 @@ from .models import Investment, InvestmentGoal
 from .impact_calculator import ImpactCalculator
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
+from django.http import JsonResponse
 
-impact_calculator = ImpactCalculator()
+# Note: Avoid global instantiation of ImpactCalculator due to potential threading issues
+# We'll instantiate it within the view instead
 
 @login_required
 def invest_initiative(request, pk):
@@ -33,13 +35,21 @@ def invest_initiative(request, pk):
                     return redirect('initiative_detail', pk=initiative.pk)
             except (ValueError, InvalidOperation):
                 messages.error(request, 'Please enter a valid amount')
+        # If amount is invalid or not provided, continue to GET rendering with default impact
     
-    # Calculate impact metrics for the template
-    impact_metrics = {
-        'carbon': initiative.carbon_impact,
-        'energy': initiative.energy_impact,
-        'water': initiative.water_impact
-    }
+    # Calculate impact metrics for the template using AI predictions
+    # Use the user-provided amount if valid, otherwise default to min_investment
+    try:
+        amount = Decimal(request.POST.get('amount', initiative.min_investment))
+        if amount < initiative.min_investment:
+            amount = initiative.min_investment
+        elif initiative.max_investment and amount > initiative.max_investment:
+            amount = initiative.max_investment
+    except (ValueError, InvalidOperation):
+        amount = initiative.min_investment
+    
+    impact_metrics = Investment.calculate_impact_for_amount(initiative, amount)
+    # impact_metrics is now a dict: {'carbon': value, 'energy': value, 'water': value}
     
     context = {
         'initiative': initiative,
@@ -78,3 +88,19 @@ def add_investment_goal(request):
         return redirect('dashboard')
     
     return render(request, 'investments/add_goal.html')
+
+
+@login_required
+def impact_preview(request, pk):
+    initiative = get_object_or_404(Initiative, pk=pk)
+    try:
+        amount = Decimal(request.GET.get('amount', initiative.min_investment))
+        if amount < initiative.min_investment:
+            amount = initiative.min_investment
+        elif initiative.max_investment and amount > initiative.max_investment:
+            amount = initiative.max_investment
+    except (ValueError, InvalidOperation):
+        amount = initiative.min_investment
+    
+    impact = Investment.calculate_impact_for_amount(initiative, amount)
+    return JsonResponse(impact)
