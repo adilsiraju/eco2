@@ -21,6 +21,7 @@ class Profile(models.Model):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
     bio = models.TextField(blank=True, null=True, help_text="Tell us about yourself (max 500 characters)", max_length=500)
+    
     carbon_reduced = models.FloatField(default=0.0)
     energy_saved = models.FloatField(default=0.0)
     water_conserved = models.FloatField(default=0.0)
