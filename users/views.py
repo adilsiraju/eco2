@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm, EnhancedRegistrationForm
 from django.db import models  # Explicitly import models from django.db
 from django.db.models import Sum, Count, Q, F, Case, When, Value
@@ -211,16 +213,56 @@ def dashboard(request):
 @login_required
 def profile(request):
     if request.method == 'POST':
+        # Check if profile image is being updated
+        if 'profile_image' in request.FILES:
+            profile = request.user.profile
+            profile.profile_image = request.FILES['profile_image']
+            profile.save()
+            messages.success(request, "Profile picture updated successfully")
+            return redirect('profile')
+            
+        # Check if password change was submitted
+        if 'old_password' in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                # Keep the user logged in after password change
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Your password was successfully updated!')
+                return redirect('profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+                # Pass the password form with errors to the template
+                user_form = UserUpdateForm(instance=request.user)
+                profile_form = UserProfileForm(instance=request.user.profile)
+                context = {
+                    'user_form': user_form, 
+                    'profile_form': profile_form, 
+                    'password_form': password_form
+                }
+                return render(request, 'users/profile.html', context)
+                
+        # Handle profile update
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('dashboard')
+            messages.success(request, 'Your profile was successfully updated!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = UserProfileForm(instance=request.user.profile)
-    context = {'user_form': user_form, 'profile_form': profile_form}
+        password_form = PasswordChangeForm(request.user)
+    
+    context = {
+        'user_form': user_form, 
+        'profile_form': profile_form,
+        'password_form': password_form
+    }
     return render(request, 'users/profile.html', context)
 
 @login_required
