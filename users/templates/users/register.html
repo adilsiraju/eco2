@@ -75,6 +75,10 @@
         border-radius: 8px;
         padding: 2rem;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .registration-progress {
@@ -270,84 +274,84 @@
                         
                         <!-- Step 1: Basic Info -->
                         <div class="form-step active" id="form-step-1">
-                            <h3 class="mb-4">Create Your Account</h3>
+                            <h3 class="mb-4 text-center">Create Your Account</h3>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
                                 {{ form.username }}
                                 <div class="form-feedback" id="username-feedback"></div>
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
                                 {{ form.email }}
                                 <div class="form-feedback" id="email-feedback"></div>
                             </div>
                             
-                            <div class="form-navigation">
+                            <div class="form-navigation mt-5">
                                 <div></div>
-                                <button type="button" class="btn btn-success" id="step-1-next">Continue</button>
+                                <button type="button" class="btn btn-success px-4 py-2" id="step-1-next">Continue</button>
                             </div>
                         </div>
                         
                         <!-- Step 2: Personal Info -->
                         <div class="form-step" id="form-step-2">
-                            <h3 class="mb-4">Your Personal Information</h3>
+                            <h3 class="mb-4 text-center">Your Personal Information</h3>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            <div class="row g-3 px-md-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
                                     {{ form.first_name }}
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
                                     {{ form.last_name }}
                                 </div>
                             </div>
                             
-                            <div class="form-navigation">
-                                <button type="button" class="btn btn-outline-secondary" id="step-2-prev">Back</button>
-                                <button type="button" class="btn btn-success" id="step-2-next">Continue</button>
+                            <div class="form-navigation mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="step-2-prev">Back</button>
+                                <button type="button" class="btn btn-success px-4 py-2" id="step-2-next">Continue</button>
                             </div>
                         </div>
                         
                         <!-- Step 3: Password -->
                         <div class="form-step" id="form-step-3">
-                            <h3 class="mb-4">Set Your Password</h3>
+                            <h3 class="mb-4 text-center">Set Your Password</h3>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
                                 {{ form.password1 }}
                                 <div class="form-feedback" id="password1-feedback"></div>
-                                <small class="form-text text-muted">
+                                <small class="form-text text-muted mt-2">
                                     Create a strong password that's at least 8 characters long with a mix of letters, numbers, and symbols.
                                 </small>
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password</label>
                                 {{ form.password2 }}
                                 <div class="form-feedback" id="password2-feedback"></div>
                             </div>
                             
-                            <div class="form-navigation">
-                                <button type="button" class="btn btn-outline-secondary" id="step-3-prev">Back</button>
-                                <button type="button" class="btn btn-success" id="step-3-next">Continue</button>
+                            <div class="form-navigation mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="step-3-prev">Back</button>
+                                <button type="button" class="btn btn-success px-4 py-2" id="step-3-next">Continue</button>
                             </div>
                         </div>
 
                         <!-- Step 4: Profile Details -->
                         <div class="form-step" id="form-step-4">
-                            <h3 class="mb-4">Profile Details</h3>
+                            <h3 class="mb-4 text-center">Profile Details</h3>
                             
-                            <div class="mb-4">
-                                <label class="form-label">Profile Image</label>
-                                <div class="d-flex align-items-start">
-                                    <div class="profile-image-container" id="profile-image-container">
+                            <div class="mb-4 px-md-3">
+                                <label class="form-label d-block">Profile Image</label>
+                                <div class="d-flex flex-column flex-md-row align-items-center">
+                                    <div class="profile-image-container" id="profile-image-container" style="margin: 0 auto;">
                                         <img id="profile-image-preview" class="profile-image-preview" src="#" alt="Profile preview">
                                         <i class="fas fa-user profile-image-placeholder" id="profile-image-placeholder"></i>
                                     </div>
-                                    <div class="ms-3 flex-grow-1">
+                                    <div class="ms-0 ms-md-4 mt-3 mt-md-0 flex-grow-1 text-center text-md-start">
                                         {{ form.profile_image }}
                                         <p class="profile-image-instructions">
                                             Upload a profile picture (optional)<br>
@@ -357,49 +361,49 @@
                                 </div>
                             </div>
                             
-                            <div class="mb-4">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
                                 {{ form.phone_number }}
-                                <small class="form-text text-muted">Format: +919876543210</small>
+                                <small class="form-text text-muted mt-2 d-block">Format: +919876543210</small>
                             </div>
                             
-                            <h4 class="mb-3 mt-4">Address Information</h4>
+                            <h4 class="mb-4 mt-5 pt-2 border-top pt-4 text-center">Address Information</h4>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.address_line1.id_for_label }}" class="form-label">Address Line 1</label>
                                 {{ form.address_line1 }}
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-4 px-md-3">
                                 <label for="{{ form.address_line2.id_for_label }}" class="form-label">Address Line 2</label>
                                 {{ form.address_line2 }}
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            <div class="row g-3 px-md-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
                                     {{ form.city }}
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
                                     {{ form.state }}
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            <div class="row g-3 px-md-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
                                     {{ form.postal_code }}
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-4">
                                     <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
                                     {{ form.country }}
                                 </div>
                             </div>
                             
-                            <div class="form-navigation">
-                                <button type="button" class="btn btn-outline-secondary" id="step-4-prev">Back</button>
-                                <button type="submit" class="btn btn-success">Create Account</button>
+                            <div class="form-navigation mt-5">
+                                <button type="button" class="btn btn-outline-secondary px-4 py-2" id="step-4-prev">Back</button>
+                                <button type="submit" class="btn btn-success px-4 py-2">Create Account</button>
                             </div>
                         </div>
                     </form>

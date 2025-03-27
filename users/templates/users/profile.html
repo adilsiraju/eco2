@@ -2,50 +2,336 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% block title %}Your Profile - Ecovest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        max-width: 1100px;
+        margin: 2rem auto;
+    }
+    
+    .profile-hero {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 2rem 0;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .profile-image-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-form {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .profile-stats {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .profile-stats:hover {
+        transform: translateY(-5px);
+    }
+    
+    .profile-stats-icon {
+        font-size: 2rem;
+        color: #28a745;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-section {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    
+    .form-section-title {
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .submit-btn {
+        background-color: #28a745;
+        border-color: #28a745;
+        padding: 0.6rem 0;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-image-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(40, 167, 69, 0.9);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-image-upload:hover {
+        background-color: rgba(40, 167, 69, 1);
+    }
+    
+    .profile-image-upload i {
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    #profile-image-input {
+        display: none;
+    }
+    
+    .profile-tabs {
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .profile-tabs .nav-link {
+        border: none;
+        color: #495057;
+        font-weight: 500;
+        padding: 1rem 1.5rem;
+        position: relative;
+    }
+    
+    .profile-tabs .nav-link.active {
+        color: #28a745;
+        background-color: white;
+        border-bottom: 3px solid #28a745;
+    }
+    
+    .profile-tabs .nav-link:hover:not(.active) {
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+    
+    .tab-container {
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="mb-4">
-                    {% if user.profile.profile_image %}
-                        <img src="{{ user.profile.profile_image.url }}" class="rounded-circle mb-3 profile-img" alt="Profile Image">
-                    {% else %}
-                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle mb-3 profile-img" alt="Default Profile Image">
-                    {% endif %}
-                </div>
-                <h1 class="display-4 fw-bold mb-4">
-                    {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}'s Profile
-                </h1>
-                <p class="lead mb-4">Update your personal and profile details below</p>
+<!-- Profile Hero Section -->
+<div class="profile-container">
+    <div class="profile-hero text-center">
+        <div class="container">
+            <div class="profile-image-container">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" class="profile-image" alt="Profile Image">
+                {% else %}
+                    <img src="{% static 'images/default_profile.png' %}" class="profile-image" alt="Default Profile Image">
+                {% endif %}
+                <label for="profile-image-input" class="profile-image-upload" title="Change profile picture">
+                    <i class="fas fa-camera"></i>
+                </label>
             </div>
-            <div class="col-lg-6 d-none d-lg-block text-center">
-                <img src="https://source.unsplash.com/random/600x400/?sustainability,profile" alt="Profile Overview" class="img-fluid rounded shadow-lg mt-5 mt-lg-0">
-            </div>
+            <h1 class="display-5 fw-bold mb-2">
+                {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+            </h1>
+            <p class="lead mb-0">Ecovest Member since {{ user.date_joined|date:"F Y" }}</p>
         </div>
     </div>
-</section>
-
-<!-- Profile Form Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card initiative-card">
-                    <div class="card-body p-4">
-                        <form method="post" enctype="multipart/form-data">
+    
+    <div class="container py-4">
+        <div class="row g-4">
+            <!-- Profile Stats Column -->
+            <div class="col-lg-4">
+                <div class="profile-stats text-center">
+                    <i class="fas fa-leaf profile-stats-icon"></i>
+                    <h3 class="h4 mb-2">Impact Score</h3>
+                    <p class="mb-0 fs-4 fw-bold text-success">87</p>
+                </div>
+                
+                <div class="profile-stats text-center">
+                    <i class="fas fa-chart-line profile-stats-icon"></i>
+                    <h3 class="h4 mb-2">Investments</h3>
+                    <p class="mb-0 fs-4 fw-bold text-success">12</p>
+                </div>
+                
+                <div class="profile-stats text-center">
+                    <i class="fas fa-hand-holding-usd profile-stats-icon"></i>
+                    <h3 class="h4 mb-2">Portfolio Value</h3>
+                    <p class="mb-0 fs-4 fw-bold text-success">$24,580</p>
+                </div>
+            </div>
+            
+            <!-- Profile Form Column -->
+            <div class="col-lg-8">
+                <div class="tab-container">
+                    <ul class="nav nav-tabs profile-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal-tab-pane" type="button" role="tab" aria-controls="personal-tab-pane" aria-selected="true">
+                                <i class="fas fa-user me-2"></i>Personal Info
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address-tab-pane" type="button" role="tab" aria-controls="address-tab-pane" aria-selected="false">
+                                <i class="fas fa-map-marker-alt me-2"></i>Address
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-tab-pane" type="button" role="tab" aria-controls="security-tab-pane" aria-selected="false">
+                                <i class="fas fa-shield-alt me-2"></i>Security
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="profile-form">
+                        <form method="post" enctype="multipart/form-data" id="profile-form">
                             {% csrf_token %}
-                            <h4 class="mb-3">Personal Information</h4>
-                            {% bootstrap_form user_form %}
-                            <h4 class="mb-3 mt-4">Profile Details</h4>
-                            {% bootstrap_form profile_form %}
-                            <button type="submit" class="btn btn-primary w-100 mt-3">Update Profile</button>
+                            <input type="file" id="profile-image-input" name="profile_image" accept="image/*" onchange="document.getElementById('profile-form').submit();">
+                            
+                            <div class="tab-content" id="profileTabsContent">
+                                <!-- Personal Info Tab -->
+                                <div class="tab-pane fade show active" id="personal-tab-pane" role="tabpanel" aria-labelledby="personal-tab" tabindex="0">
+                                    <div class="form-section">
+                                        <h4 class="form-section-title">Basic Information</h4>
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ user_form.username.id_for_label }}" class="form-label">Username</label>
+                                                {{ user_form.username }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ user_form.email.id_for_label }}" class="form-label">Email</label>
+                                                {{ user_form.email }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                                {{ user_form.first_name }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                                {{ user_form.last_name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h4 class="form-section-title">Contact Information</h4>
+                                        <div class="mb-3">
+                                            <label for="{{ profile_form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                                            {{ profile_form.phone_number }}
+                                            <div class="form-text text-muted">Format: +919876543210</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Address Tab -->
+                                <div class="tab-pane fade" id="address-tab-pane" role="tabpanel" aria-labelledby="address-tab" tabindex="0">
+                                    <div class="form-section">
+                                        <h4 class="form-section-title">Address Details</h4>
+                                        <div class="mb-3">
+                                            <label for="{{ profile_form.address_line1.id_for_label }}" class="form-label">Address Line 1</label>
+                                            {{ profile_form.address_line1 }}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="{{ profile_form.address_line2.id_for_label }}" class="form-label">Address Line 2</label>
+                                            {{ profile_form.address_line2 }}
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ profile_form.city.id_for_label }}" class="form-label">City</label>
+                                                {{ profile_form.city }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ profile_form.state.id_for_label }}" class="form-label">State/Province</label>
+                                                {{ profile_form.state }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ profile_form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
+                                                {{ profile_form.postal_code }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ profile_form.country.id_for_label }}" class="form-label">Country</label>
+                                                {{ profile_form.country }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Security Tab -->
+                                <div class="tab-pane fade" id="security-tab-pane" role="tabpanel" aria-labelledby="security-tab" tabindex="0">
+                                    <div class="form-section">
+                                        <h4 class="form-section-title">Change Password</h4>
+                                        <div class="mb-3">
+                                            <label for="{{ password_change_form.old_password.id_for_label }}" class="form-label">Old Password</label>
+                                            {{ password_change_form.old_password }}
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ password_change_form.new_password1.id_for_label }}" class="form-label">New Password</label>
+                                                {{ password_change_form.new_password1 }}
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ password_change_form.new_password2.id_for_label }}" class="form-label">Confirm New Password</label>
+                                                {{ password_change_form.new_password2 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-success submit-btn">Save Changes</button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
