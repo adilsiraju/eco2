@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
+from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm, EnhancedRegistrationForm
 from django.db import models  # Explicitly import models from django.db
 from django.db.models import Sum, Count, Q, F, Case, When, Value
 from django.db.models.functions import Cast
@@ -19,11 +19,9 @@ from onboarding.models import OnboardingProgress, UserPreference
 
 def register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = EnhancedRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            # Create a profile for the new user
-            Profile.objects.get_or_create(user=user)
             
             # Log the user in
             login(request, user)
@@ -37,7 +35,7 @@ def register(request):
             # If form is invalid, add form error information to be displayed in the template
             print("Form validation errors:", form.errors)
     else:
-        form = CustomUserCreationForm()
+        form = EnhancedRegistrationForm()
         
     return render(request, 'users/register.html', {
         'form': form,

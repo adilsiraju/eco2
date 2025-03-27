@@ -178,6 +178,39 @@
     .feedback-invalid {
         color: #dc3545;
     }
+    
+    .profile-image-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 1rem;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        border: 2px dashed #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .profile-image-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+    
+    .profile-image-placeholder {
+        color: #28a745;
+        font-size: 2.5rem;
+    }
+    
+    .profile-image-instructions {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
 </style>
 {% endblock %}
 
@@ -228,9 +261,11 @@
                         <div class="progress-step" id="step-2">2</div>
                         <div class="progress-line" id="line-2-3"></div>
                         <div class="progress-step" id="step-3">3</div>
+                        <div class="progress-line" id="line-3-4"></div>
+                        <div class="progress-step" id="step-4">4</div>
                     </div>
                     
-                    <form method="post" id="registration-form">
+                    <form method="post" id="registration-form" enctype="multipart/form-data">
                         {% csrf_token %}
                         
                         <!-- Step 1: Basic Info -->
@@ -297,6 +332,73 @@
                             
                             <div class="form-navigation">
                                 <button type="button" class="btn btn-outline-secondary" id="step-3-prev">Back</button>
+                                <button type="button" class="btn btn-success" id="step-3-next">Continue</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Profile Details -->
+                        <div class="form-step" id="form-step-4">
+                            <h3 class="mb-4">Profile Details</h3>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Profile Image</label>
+                                <div class="d-flex align-items-start">
+                                    <div class="profile-image-container" id="profile-image-container">
+                                        <img id="profile-image-preview" class="profile-image-preview" src="#" alt="Profile preview">
+                                        <i class="fas fa-user profile-image-placeholder" id="profile-image-placeholder"></i>
+                                    </div>
+                                    <div class="ms-3 flex-grow-1">
+                                        {{ form.profile_image }}
+                                        <p class="profile-image-instructions">
+                                            Upload a profile picture (optional)<br>
+                                            For best results, use a square image.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                                {{ form.phone_number }}
+                                <small class="form-text text-muted">Format: +919876543210</small>
+                            </div>
+                            
+                            <h4 class="mb-3 mt-4">Address Information</h4>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.address_line1.id_for_label }}" class="form-label">Address Line 1</label>
+                                {{ form.address_line1 }}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.address_line2.id_for_label }}" class="form-label">Address Line 2</label>
+                                {{ form.address_line2 }}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                                    {{ form.city }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
+                                    {{ form.postal_code }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
+                                    {{ form.country }}
+                                </div>
+                            </div>
+                            
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-outline-secondary" id="step-4-prev">Back</button>
                                 <button type="submit" class="btn btn-success">Create Account</button>
                             </div>
                         </div>
@@ -326,8 +428,15 @@
             let hasErrorsStep1 = {% if 'username' in form.errors or 'email' in form.errors %}true{% else %}false{% endif %};
             let hasErrorsStep2 = {% if 'first_name' in form.errors or 'last_name' in form.errors %}true{% else %}false{% endif %};
             let hasErrorsStep3 = {% if 'password1' in form.errors or 'password2' in form.errors %}true{% else %}false{% endif %};
+            let hasErrorsStep4 = {% if 'profile_image' in form.errors or 'phone_number' in form.errors or 'address_line1' in form.errors or 'address_line2' in form.errors or 'city' in form.errors or 'state' in form.errors or 'postal_code' in form.errors or 'country' in form.errors %}true{% else %}false{% endif %};
             
-            if (hasErrorsStep3) {
+            if (hasErrorsStep4) {
+                goToStep(4);
+                // Display profile errors if any
+                {% if form.profile_image.errors or form.phone_number.errors or form.address_line1.errors or form.address_line2.errors or form.city.errors or form.state.errors or form.postal_code.errors or form.country.errors %}
+                    alert("Please check your profile details for errors");
+                {% endif %}
+            } else if (hasErrorsStep3) {
                 goToStep(3);
                 
                 // Display password errors
@@ -409,6 +518,33 @@
         // Step 3 to step 2
         document.getElementById('step-3-prev').addEventListener('click', function() {
             goToStep(2);
+        });
+        
+        // Step 3 to step 4
+        document.getElementById('step-3-next').addEventListener('click', function() {
+            const password1Input = document.getElementById('{{ form.password1.id_for_label }}');
+            const password2Input = document.getElementById('{{ form.password2.id_for_label }}');
+            
+            let isValid = true;
+            
+            // Password validation
+            if (!validatePassword(password1Input.value)) {
+                isValid = false;
+            }
+            
+            // Confirm password validation
+            if (!validatePasswordMatch(password1Input.value, password2Input.value)) {
+                isValid = false;
+            }
+            
+            if (isValid) {
+                goToStep(4);
+            }
+        });
+        
+        // Step 4 to step 3
+        document.getElementById('step-4-prev').addEventListener('click', function() {
+            goToStep(3);
         });
         
         function goToStep(step) {
@@ -512,6 +648,28 @@
                 return true;
             }
         }
+        
+        // Profile image preview functionality
+        const profileImageInput = document.getElementById('{{ form.profile_image.id_for_label }}');
+        const profileImagePreview = document.getElementById('profile-image-preview');
+        const profileImagePlaceholder = document.getElementById('profile-image-placeholder');
+        
+        profileImageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    profileImagePreview.src = e.target.result;
+                    profileImagePreview.style.display = 'block';
+                    profileImagePlaceholder.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                profileImagePreview.style.display = 'none';
+                profileImagePlaceholder.style.display = 'block';
+            }
+        });
     });
 </script>
 {% endblock %}
