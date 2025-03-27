@@ -7,9 +7,46 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
         widgets = {
-            'first_name': forms.TextInput(attrs={'placeholder': 'Enter your first name'}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Enter your last name'}),
+            'username': forms.TextInput(attrs={
+                'placeholder': 'Choose a username',
+                'class': 'form-control',
+                'autocomplete': 'username'
+            }),
+            'email': forms.EmailInput(attrs={
+                'placeholder': 'you@example.com',
+                'class': 'form-control',
+                'autocomplete': 'email'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'placeholder': 'Your first name',
+                'class': 'form-control',
+                'autocomplete': 'given-name'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'placeholder': 'Your last name',
+                'class': 'form-control',
+                'autocomplete': 'family-name'
+            }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Override the default widgets for password fields
+        self.fields['password1'].widget = forms.PasswordInput(attrs={
+            'placeholder': 'Create a password',
+            'class': 'form-control',
+            'autocomplete': 'new-password'
+        })
+        self.fields['password2'].widget = forms.PasswordInput(attrs={
+            'placeholder': 'Confirm password',
+            'class': 'form-control',
+            'autocomplete': 'new-password'
+        })
+        
+        # Custom help text
+        self.fields['email'].help_text = "We'll never share your email with anyone else."
+        # Remove default Django help text that will be replaced with our custom UI feedback
+        self.fields['password1'].help_text = ""
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:

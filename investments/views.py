@@ -15,27 +15,64 @@ def invest_initiative(request, pk):
     initiative = get_object_or_404(Initiative, pk=pk)
     
     if request.method == 'POST':
-        amount = request.POST.get('amount')
-        if amount:
+        amount_str = request.POST.get('amount', '')
+        print(f"Original amount string: '{amount_str}'")
+        
+        # Strip any commas, spaces or currency symbols
+        amount_str = ''.join(c for c in amount_str if c.isdigit() or c == '.')
+        print(f"Cleaned amount string: '{amount_str}'")
+        
+        if amount_str:
             try:
-                amount = Decimal(amount)
+                # Convert to Decimal for precise financial calculations
+                amount = Decimal(amount_str)
+                print(f"Converted to Decimal: {amount}")
+                
                 if amount < initiative.min_investment:
                     messages.error(request, f'Minimum investment amount is ₹{initiative.min_investment:,}')
                 elif initiative.max_investment and amount > initiative.max_investment:
                     messages.error(request, f'Maximum investment amount is ₹{initiative.max_investment:,}')
                 else:
                     # Create the investment
-                    investment = Investment.objects.create(
-                        user=request.user,
-                        initiative=initiative,
-                        amount=amount
-                    )
-                    
-                    messages.success(request, f'Successfully invested ₹{amount:,} in {initiative.title}')
-                    return redirect('initiative_detail', pk=initiative.pk)
-            except (ValueError, InvalidOperation):
+                    try:
+                        investment = Investment(
+                            user=request.user,
+                            initiative=initiative,
+                            amount=amount
+                        )
+                        
+                        # Calculate impact metrics
+                        impact = Investment.calculate_impact_for_amount(initiative, amount)
+                        print(f"Impact calculation result: {impact}")
+                        
+                        # Extract and convert impact values to float
+                        investment.carbon_impact = float(impact.get('carbon', 0))
+                        investment.energy_impact = float(impact.get('energy', 0))
+                        investment.water_impact = float(impact.get('water', 0))
+                        
+                        # Save the investment - this also updates initiative's current_amount via the save method
+                        investment.save()
+                        
+                        # Clear any previous messages to prevent old errors from showing
+                        storage = messages.get_messages(request)
+                        storage.used = True
+                        
+                        # Add success message
+                        messages.success(request, f'Successfully invested ₹{amount:,} in {initiative.title}')
+                        
+                        # Redirect to user's dashboard to see their holdings
+                        return redirect('dashboard')
+                        
+                    except Exception as e:
+                        print(f"Error saving investment: {str(e)}")
+                        messages.error(request, f"An error occurred while processing your investment: {str(e)}")
+                        
+            except (ValueError, InvalidOperation) as e:
+                print(f"Error processing amount '{amount_str}': {e}")
                 messages.error(request, 'Please enter a valid amount')
-        # If amount is invalid or not provided, continue to GET rendering with default impact
+        else:
+            print("Amount string is empty")
+            messages.error(request, 'Please enter an investment amount')
     
     # Calculate impact metrics for the template using AI predictions
     # Use the user-provided amount if valid, otherwise default to min_investment
@@ -49,7 +86,6 @@ def invest_initiative(request, pk):
         amount = initiative.min_investment
     
     impact_metrics = Investment.calculate_impact_for_amount(initiative, amount)
-    # impact_metrics is now a dict: {'carbon': value, 'energy': value, 'water': value}
     
     context = {
         'initiative': initiative,
@@ -94,12 +130,23 @@ def add_investment_goal(request):
 def impact_preview(request, pk):
     initiative = get_object_or_404(Initiative, pk=pk)
     try:
-        amount = Decimal(request.GET.get('amount', initiative.min_investment))
+        amount_str = request.GET.get('amount', '')
+        print(f"Impact preview - original amount: '{amount_str}'")
+        
+        # Clean the input similar to the invest view
+        amount_str = ''.join(c for c in amount_str if c.isdigit() or c == '.')
+        
+        if not amount_str:
+            amount = initiative.min_investment
+        else:
+            amount = Decimal(amount_str)
+            
         if amount < initiative.min_investment:
             amount = initiative.min_investment
         elif initiative.max_investment and amount > initiative.max_investment:
             amount = initiative.max_investment
-    except (ValueError, InvalidOperation):
+    except (ValueError, InvalidOperation) as e:
+        print(f"Impact preview - error processing amount: {e}")
         amount = initiative.min_investment
     
     impact = Investment.calculate_impact_for_amount(initiative, amount)

@@ -153,8 +153,68 @@
         </div>
     </div>
 </div>
-
 <div class="container">
+    <!-- Personalized Recommendations -->
+    {% if user_preferences %}
+    <div class="dashboard-card">
+        <h2 class="mb-4">
+            <i class="fas fa-lightbulb text-warning"></i> Recommended for You
+        </h2>
+        <div class="row g-4">
+            {% for initiative in recommended_initiatives %}
+            <div class="col-md-4">
+                <div class="investment-card">
+                    {% if initiative.image %}
+                    <img src="{{ initiative.image.url }}" alt="{{ initiative.title }}" class="investment-image">
+                    {% else %}
+                    <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="investment-image">
+                    {% endif %}
+                    <div class="investment-content">
+                        <div class="mb-2">
+                            {% for category in initiative.categories.all %}
+                            <span class="badge bg-success">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <h3 class="investment-title">{{ initiative.title }}</h3>
+                        <div class="investment-amount">₹{{ initiative.min_investment|intcomma }} min.</div>
+                        
+                        <div class="impact-stats">
+                            <div class="impact-stat">
+                                <i class="fas fa-cloud"></i>
+                                {{ initiative.carbon_impact|floatformat:0|intcomma }} kg
+                            </div>
+                            <div class="impact-stat">
+                                <i class="fas fa-bolt"></i>
+                                {{ initiative.energy_impact|floatformat:0|intcomma }} kWh
+                            </div>
+                            <div class="impact-stat">
+                                <i class="fas fa-tint"></i>
+                                {{ initiative.water_impact|floatformat:0|intcomma }} L
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-thumbs-up"></i> {{ initiative.match_score|floatformat:0 }}% match with your preferences
+                            </div>
+                            <a href="{% url 'initiative_detail' initiative.id %}" class="btn btn-outline-success btn-sm">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> We're finding initiatives that match your preferences. Check back soon!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
     <!-- AI Portfolio Insights -->
     <div class="dashboard-card">
         <h2 class="mb-4">

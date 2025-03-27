@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users',
     'initiatives',
     'investments',
+    'onboarding',
 ]
 
 MIDDLEWARE = [

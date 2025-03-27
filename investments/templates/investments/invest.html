@@ -133,9 +133,8 @@
                         <label for="amount" class="form-label">Investment Amount (₹)</label>
                         <div class="input-group">
                             <span class="input-group-text">₹</span>
-                            <input type="number" class="form-control form-control-lg" id="amount" name="amount" 
-                                   min="{{ min_investment }}" max="{% if max_investment %}{{ max_investment }}{% endif %}" 
-                                   step="100" required
+                            <input type="text" class="form-control form-control-lg" id="amount" name="amount" 
+                                   required
                                    placeholder="Enter amount (minimum ₹{{ min_investment|intcomma }})">
                         </div>
                         <div class="form-text">Minimum investment: ₹{{ min_investment|intcomma }}{% if max_investment %}, Maximum: ₹{{ max_investment|intcomma }}{% endif %}</div>
@@ -266,13 +265,28 @@ document.getElementById('amount').addEventListener('input', function(e) {
 });
 
 document.getElementById('investmentForm').addEventListener('submit', function(e) {
-    const amount = parseFloat(document.getElementById('amount').value);
-    if (amount < {{ min_investment }}) {
+    const amountInput = document.getElementById('amount').value;
+    // Clean input similar to server-side processing
+    const cleanedAmount = amountInput.replace(/[^\d.]/g, '');
+    
+    if (!cleanedAmount) {
+        e.preventDefault();
+        alert('Please enter an investment amount');
+        return;
+    }
+    
+    const amount = parseFloat(cleanedAmount);
+    const minInvestment = {{ min_investment }};
+    {% if max_investment %}
+    const maxInvestment = {{ max_investment }};
+    {% endif %}
+    
+    if (isNaN(amount) || amount < minInvestment) {
         e.preventDefault();
         alert('Minimum investment amount is ₹{{ min_investment|intcomma }}');
     }
     {% if max_investment %}
-    else if (amount > {{ max_investment }}) {
+    else if (amount > maxInvestment) {
         e.preventDefault();
         alert('Maximum investment amount is ₹{{ max_investment|intcomma }}');
     }

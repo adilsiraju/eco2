@@ -3,7 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
 from django.db import models  # Explicitly import models from django.db
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q, F, Case, When, Value
+from django.db.models.functions import Cast
 from investments.models import Investment
 from initiatives.models import Initiative, Category
 from .models import Profile
@@ -12,25 +13,118 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from investments.portfolio_analyzer import PortfolioAnalyzer
 from django.db.models.functions import Coalesce
-from django.db.models import DecimalField
+from django.db.models import DecimalField, FloatField
 from collections import defaultdict
+from onboarding.models import OnboardingProgress, UserPreference
 
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Create a profile for the new user
             Profile.objects.get_or_create(user=user)
+            
+            # Log the user in
             login(request, user)
-            return redirect('dashboard')
+            
+            # Create onboarding progress entry for the new user
+            OnboardingProgress.objects.get_or_create(user=user)
+            
+            # Redirect to the first step of onboarding
+            return redirect('onboarding_welcome')
+        else:
+            # If form is invalid, add form error information to be displayed in the template
+            print("Form validation errors:", form.errors)
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+        
+    return render(request, 'users/register.html', {
+        'form': form,
+        'form_errors': form.errors.items() if request.method == 'POST' else None
+    })
 
 @login_required
 def dashboard(request):
+    # Check if user has completed onboarding
+    onboarding_progress, created = OnboardingProgress.objects.get_or_create(user=request.user)
+    
+    # If onboarding is not complete, redirect to the appropriate onboarding step
+    if not onboarding_progress.is_complete:
+        if not onboarding_progress.welcome_completed:
+            return redirect('onboarding_welcome')
+        elif not onboarding_progress.interests_completed:
+            return redirect('onboarding_interests')
+        elif not onboarding_progress.investment_profile_completed:
+            return redirect('onboarding_investment_profile')
+        elif not onboarding_progress.tutorial_completed:
+            return redirect('onboarding_tutorial')
+    
     user = request.user
     investments = user.investments.all().select_related('initiative')
+    
+    # Get user preferences for personalized recommendations
+    try:
+        user_preferences = UserPreference.objects.get(user=user)
+        
+        # Query initiatives that match user preferences
+        recommended_initiatives_query = Initiative.objects.filter(
+            status='active'  # Use status='active' instead of is_active=True
+        ).exclude(
+            id__in=[inv.initiative.id for inv in investments]  # Exclude already invested
+        ).prefetch_related('categories')
+        
+        # Filter by user's interested categories if they selected any
+        if user_preferences.interested_categories.exists():
+            recommended_initiatives_query = recommended_initiatives_query.filter(
+                categories__in=user_preferences.interested_categories.all()
+            ).distinct()
+        
+        # Filter by investment amount preferences
+        recommended_initiatives_query = recommended_initiatives_query.filter(
+            min_investment__lte=user_preferences.max_investment,
+            goal_amount__gte=user_preferences.min_investment
+        )
+        
+        # Order by matches to preference priorities
+        recommended_initiatives = list(recommended_initiatives_query[:6])
+        
+        # Calculate match scores based on impact priorities
+        for initiative in recommended_initiatives:
+            # Base score starts at 50%
+            match_score = 50
+            
+            # Add points for category match
+            if initiative.categories.filter(id__in=user_preferences.interested_categories.values_list('id', flat=True)).exists():
+                match_score += 15
+            
+            # Add points for risk match (risk_level 1-3 maps to low, moderate, high)
+            risk_map = {'low': 1, 'moderate': 2, 'high': 3}
+            if initiative.risk_level == risk_map.get(user_preferences.risk_tolerance, 2):
+                match_score += 10
+            
+            # Add points for impact priorities alignment
+            carbon_weight = user_preferences.carbon_priority / 10  # 0.1 to 1.0
+            energy_weight = user_preferences.energy_priority / 10
+            water_weight = user_preferences.water_priority / 10
+            
+            # Higher points if high impact in areas user cares about
+            if initiative.carbon_impact > 1000 and carbon_weight > 0.5:
+                match_score += 5 * carbon_weight
+            if initiative.energy_impact > 1000 and energy_weight > 0.5:
+                match_score += 5 * energy_weight
+            if initiative.water_impact > 1000 and water_weight > 0.5:
+                match_score += 5 * water_weight
+            
+            # Cap at 100%
+            initiative.match_score = min(match_score, 100)
+        
+        # Sort by match score
+        recommended_initiatives.sort(key=lambda x: getattr(x, 'match_score', 0), reverse=True)
+        
+    except UserPreference.DoesNotExist:
+        user_preferences = None
+        recommended_initiatives = []
     
     # Calculate total invested amount
     total_invested = investments.aggregate(
@@ -111,6 +205,8 @@ def dashboard(request):
         'impact_by_category': dict(impact_by_category),
         'portfolio_analysis': json.dumps(portfolio_analysis, cls=DjangoJSONEncoder),
         'portfolio_recommendations': portfolio_recommendations,
+        'user_preferences': user_preferences,
+        'recommended_initiatives': recommended_initiatives,
     }
     return render(request, 'users/dashboard.html', context)
 

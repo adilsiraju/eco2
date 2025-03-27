@@ -28,7 +28,8 @@ class Investment(models.Model):
         calculator = ImpactCalculator()
         categories = [cat.name for cat in self.initiative.categories.all()]
         
-        carbon, energy, water = calculator.predict_impact(
+        # Get impact values as a dictionary
+        impact = calculator.predict_impact(
             investment_amount=float(self.amount),
             category_names=categories,
             project_duration_months=self.initiative.duration_months,
@@ -37,11 +38,7 @@ class Investment(models.Model):
             technology_type=self.initiative.technology_type
         )
         
-        return {
-            'carbon': carbon,
-            'energy': energy,
-            'water': water
-        }
+        return impact
     
     @staticmethod
     def calculate_impact_for_amount(initiative, amount):
