@@ -239,15 +239,15 @@
                     <div class="impact-stats">
                         <div class="impact-stat">
                             <i class="fas fa-cloud"></i>
-                            {{ initiative.impact_for_1000.carbon|intcomma }} kg
+                            {{ initiative.impact_for_1000.carbon|intcomma }}{% if initiative.impact_for_1000.carbon|floatformat %} kg{% endif %}
                         </div>
                         <div class="impact-stat">
                             <i class="fas fa-bolt"></i>
-                            {{ initiative.impact_for_1000.energy|intcomma }} kWh
+                            {{ initiative.impact_for_1000.energy|intcomma }}{% if initiative.impact_for_1000.energy|floatformat %} kWh{% endif %}
                         </div>
                         <div class="impact-stat">
                             <i class="fas fa-tint"></i>
-                            {{ initiative.impact_for_1000.water|intcomma }} L
+                            {{ initiative.impact_for_1000.water|intcomma }}{% if initiative.impact_for_1000.water|floatformat %} L{% endif %}
                         </div>
                     </div>
                     <div class="text-muted small mb-2">

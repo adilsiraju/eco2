@@ -7,157 +7,169 @@ from django.conf import settings
 
 class ImpactCalculator:
     def __init__(self):
-        self.model_carbon = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
-        self.model_energy = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
-        self.model_water = RandomForestRegressor(n_estimators=200, max_depth=6, min_samples_split=15, random_state=42)
+        self.model_carbon = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=5, random_state=42)
+        self.model_energy = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=5, random_state=42)
+        self.model_water = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=5, random_state=42)
         self.scaler = StandardScaler()
         self.label_encoder_location = LabelEncoder()
         self.label_encoder_technology = LabelEncoder()
+
         self.model_file_carbon = os.path.join(settings.BASE_DIR, 'investments/models/carbon_model.pkl')
         self.model_file_energy = os.path.join(settings.BASE_DIR, 'investments/models/energy_model.pkl')
         self.model_file_water = os.path.join(settings.BASE_DIR, 'investments/models/water_model.pkl')
         self.scaler_file = os.path.join(settings.BASE_DIR, 'investments/models/scaler.pkl')
+
         self.categories = [
             'Renewable Energy', 'Recycling', 'Emission Control', 'Water Conservation',
             'Reforestation', 'Sustainable Agriculture', 'Clean Transportation',
             'Waste Management', 'Green Technology', 'Ocean Conservation'
         ]
-        # Fit label encoders once during initialization
-        self.label_encoder_location.fit(['North India', 'South India', 'East India', 'West India'])
+
+        self.label_encoder_location.fit([
+            'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+            'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+            'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+            'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
+        ])
         self.label_encoder_technology.fit(['Solar', 'Wind', 'Hydro', 'Organic', 'Mechanical', 'Chemical', 'Biofuel', 'EV', 'Manual', 'AI'])
-        # Load or train models and scaler
+
         self.load_or_train_model()
 
+    def load_or_train_model(self):
+        try:
+            # Check if all necessary files exist
+            if all(os.path.exists(f) for f in [self.model_file_carbon, self.model_file_energy, self.model_file_water, self.scaler_file]):
+                print("Loading pre-trained models and scaler...")
+                with open(self.model_file_carbon, 'rb') as f:
+                    self.model_carbon = pickle.load(f)
+                with open(self.model_file_energy, 'rb') as f:
+                    self.model_energy = pickle.load(f)
+                with open(self.model_file_water, 'rb') as f:
+                    self.model_water = pickle.load(f)
+                with open(self.scaler_file, 'rb') as f:
+                    self.scaler = pickle.load(f)
+                print("Models and scaler loaded successfully.")
+            else:
+                print("One or more model/scaler files missing. Training new models...")
+                self.train_model()
+        except Exception as e:
+            print(f"Failed to load models or scaler: {e}. Training new models...")
+            self.train_model()
+
     def train_model(self):
+        # Create a more diverse training dataset with varied locations, categories, scales and technologies
         X = np.array([
-            # Original large-scale (unchanged)
-            [125000000000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 10, 0, 0],  # Renewable Energy
-            [4150000000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 5, 0, 8],    # Water Conservation
+            # Renewable Energy - Solar (high energy savings, moderate carbon reduction, minimal water impact)
+            [500000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 5, 0, 0],    # Solar large-scale in Rajasthan
+            [100000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 3, 0, 0],    # Solar medium-scale in Rajasthan  
+            [10000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 0, 0],      # Solar small-scale in Rajasthan
             
-            # Original small-scale (tripled entries kept)
-            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],  # Renewable Energy
-            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
-            [15000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 5, 1, 0],
-            [50000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 7, 0, 1],
-            [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],  # Waste Management/Recycling
-            [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
-            [15000, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 12, 4, 0, 9],
-            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],  # Water Conservation
-            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
-            [15000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
-            [20000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 18, 5, 1, 8],
-            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],  # Sustainable Agriculture
-            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 0, 3],
-            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],  # Clean Transportation
-            [15000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 4, 0, 7],
-            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],  # Waste Management
-            [15000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 3, 0, 4],
-            [15000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 3, 0, 5],  # Emission Control
-            [15000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],  # Green Technology
-            [15000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 0, 8],  # Ocean Conservation
-            [10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 3, 0, 8],
-            [25000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 1, 4],
-            [30000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 6, 0, 0],
-            [8000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 2, 1, 8],
-
-            # New small-scale initiatives
-            [500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 1, 0, 0],    # Micro solar lantern
-            [1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 2, 1, 0],  # Small solar panel
-            [5000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 3, 2, 4],  # Community recycling bin
-            [2000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 2, 0, 5],  # Small emission scrubber
-            [1000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 1, 1, 8],   # Rainwater harvesting kit
-            [500, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 6, 1, 0, 3],    # Compost pile
-            [2500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 3, 2, 7],  # Electric bike subsidy
-            [3000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 2, 1, 4],  # Waste sorting unit
-            [4000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 3, 0, 9],  # AI waste monitor
-            [2000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 2, 3, 8],  # Beach cleanup kit
-            [10000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 0, 1], # Wind turbine prototype
-            [7500, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 1, 3],  # Organic farm plot
-            [8000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12, 3, 2, 8],  # Coral restoration
-            [500, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 1, 0, 8],    # Tree planting micro-fund
-            [20000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 18, 5, 1, 7], # EV charging station
+            # Renewable Energy - Wind (high energy savings, good carbon reduction, zero water impact)
+            [750000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 7, 1, 1],    # Wind large-scale in Gujarat
+            [70000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 1, 1],     # Wind medium-scale in Gujarat
+            [5000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 1, 1],       # Wind small-scale in Gujarat
+            
+            # Recycling - Mechanical (moderate carbon reduction, low energy savings, moderate water savings)
+            [200000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 4, 13, 4],   # Recycling large-scale in Maharashtra
+            [50000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 12, 3, 13, 4],    # Recycling medium-scale in Maharashtra
+            [5000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 6, 2, 13, 4],      # Recycling small-scale in Maharashtra
+            
+            # Emission Control - Chemical (very high carbon reduction, low energy impact, low water impact)
+            [300000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 5, 25, 5],   # Emission control large-scale in UP
+            [75000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 3, 25, 5],    # Emission control medium-scale in UP
+            [3000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6, 2, 25, 5],      # Emission control small-scale in UP
+            
+            # Water Conservation (low carbon, minimal energy, extremely high water savings)
+            [250000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 4, 16, 2],   # Water conservation large-scale in Rajasthan
+            [25000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 2, 16, 2],    # Water conservation medium-scale in Rajasthan
+            [4000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 1, 16, 2],      # Water conservation small-scale in Rajasthan
+            
+            # Reforestation (highest carbon reduction, zero energy impact, good water conservation)
+            [150000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 24, 5, 3, 3],    # Reforestation large-scale in Assam
+            [75000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 18, 4, 3, 3],     # Reforestation medium-scale in Assam
+            [15000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 3, 3, 3],     # Reforestation small-scale in Assam
+            
+            # Clean Transportation - EV (high carbon reduction, high energy savings, minimal water impact)
+            [800000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 18, 7, 13, 7],   # Clean transport large-scale in Maharashtra
+            [80000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 12, 5, 13, 7],    # Clean transport medium-scale in Maharashtra
+            [8000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 2, 13, 7],      # Clean transport small-scale in Maharashtra
+            
+            # Waste Management (good carbon, moderate energy recovery, low water impact)
+            [600000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 6, 25, 4],   # Waste management large-scale in UP
+            [60000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 12, 4, 25, 4],    # Waste management medium-scale in UP
+            [6000, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 6, 2, 25, 4],      # Waste management small-scale in UP
+            
+            # Green Technology (moderate across all metrics)
+            [700000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 18, 7, 10, 9],   # Green tech large-scale in Karnataka
+            [70000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 12, 5, 10, 9],    # Green tech medium-scale in Karnataka
+            [7000, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 6, 3, 10, 9],      # Green tech small-scale in Karnataka
+            
+            # Ocean Conservation (moderate carbon, low energy, extremely high water impact)
+            [350000, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 24, 6, 9, 2],    # Ocean conservation large-scale in Kerala
+            [35000, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 18, 4, 9, 2],     # Ocean conservation medium-scale in Kerala
+            [3500, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 12, 2, 9, 2],      # Ocean conservation small-scale in Kerala
         ])
 
+        # Create impact values with category-specific focus
+        # Format: carbon (kg), energy (kWh), water (L) - per ₹1,000 investment
         y_carbon = np.array([
-            # Original large-scale
-            25000000, 500000,
-            # Original small-scale
-            1575, 1575, 1575, 3000, 750, 750, 750, 300, 300, 300, 400,
-            750, 750, 500, 500, 300, 300, 750, 800, 600, 500, 800, 2000, 300,
-            # New small-scale
-            50,    # Micro solar lantern
-            100,   # Small solar panel
-            250,   # Community recycling bin
-            150,   # Small emission scrubber
-            50,    # Rainwater harvesting kit
-            25,    # Compost pile
-            200,   # Electric bike subsidy
-            300,   # Waste sorting unit
-            400,   # AI waste monitor
-            150,   # Beach cleanup kit
-            800,   # Wind turbine prototype
-            300,   # Organic farm plot
-            500,   # Coral restoration
-            50,    # Tree planting micro-fund
-            1000,  # EV charging station
+            750, 500, 150,      # Solar (by scale)
+            700, 450, 120,      # Wind (by scale)
+            300, 200, 80,       # Recycling (by scale)
+            900, 650, 250,      # Emission Control (by scale) - highest carbon reduction
+            100, 50, 20,        # Water Conservation (by scale)
+            950, 600, 300,      # Reforestation (by scale) - highest carbon reduction
+            800, 500, 150,      # Clean Transportation (by scale)
+            500, 300, 100,      # Waste Management (by scale)
+            400, 250, 80,       # Green Technology (by scale)
+            250, 150, 50,       # Ocean Conservation (by scale)
         ])
-
+        
         y_energy = np.array([
-            # Original large-scale
-            15000000, 0,
-            # Original small-scale
-            3375, 3375, 3375, 4800, 1500, 1500, 1500, 150, 150, 150, 200,
-            0, 0, 1500, 1500, 0, 0, 500, 1000, 0, 0, 0, 4000, 0,
-            # New small-scale
-            100,   # Micro solar lantern
-            200,   # Small solar panel
-            500,   # Community recycling bin
-            100,   # Small emission scrubber
-            20,    # Rainwater harvesting kit
-            0,     # Compost pile
-            600,   # Electric bike subsidy
-            400,   # Waste sorting unit
-            600,   # AI waste monitor
-            0,     # Beach cleanup kit
-            1200,  # Wind turbine prototype
-            0,     # Organic farm plot
-            0,     # Coral restoration
-            0,     # Tree planting micro-fund
-            2000,  # EV charging station
+            1000, 600, 200,     # Solar (by scale) - highest energy savings
+            900, 500, 150,      # Wind (by scale) - high energy savings
+            100, 70, 30,        # Recycling (by scale)
+            150, 90, 30,        # Emission Control (by scale)
+            30, 20, 0,          # Water Conservation (by scale) - can be zero
+            0, 0, 0,            # Reforestation (by scale) - zero energy impact
+            750, 450, 120,      # Clean Transportation (by scale) - high energy savings
+            400, 250, 80,       # Waste Management (by scale)
+            350, 200, 60,       # Green Technology (by scale)
+            50, 30, 0,          # Ocean Conservation (by scale) - can be zero
         ])
-
+        
         y_water = np.array([
-            # Original large-scale
-            0, 10000000,
-            # Original small-scale
-            0, 0, 0, 0, 0, 0, 0, 400000, 400000, 400000, 600000,
-            0, 0, 0, 0, 7500, 7500, 0, 0, 0, 2000, 1000, 0, 800,
-            # New small-scale
-            0,      # Micro solar lantern
-            0,      # Small solar panel
-            0,      # Community recycling bin
-            0,      # Small emission scrubber
-            5000,   # Rainwater harvesting kit
-            200,    # Compost pile
-            0,      # Electric bike subsidy
-            0,      # Waste sorting unit
-            0,      # AI waste monitor
-            0,      # Beach cleanup kit
-            0,      # Wind turbine prototype
-            1000,   # Organic farm plot
-            2000,   # Coral restoration
-            0,      # Tree planting micro-fund
-            0,      # EV charging station
+            50, 30, 0,          # Solar (by scale) - can be zero water impact
+            0, 0, 0,            # Wind (by scale) - zero water impact
+            200, 150, 50,       # Recycling (by scale)
+            300, 150, 50,       # Emission Control (by scale) - REDUCED water impact
+            3000, 2000, 1000,   # Water Conservation (by scale) - GREATLY INCREASED water savings
+            500, 350, 200,      # Reforestation (by scale) - good water savings
+            20, 15, 0,          # Clean Transportation (by scale) - can be zero
+            150, 100, 30,       # Waste Management (by scale)
+            250, 150, 50,       # Green Technology (by scale)
+            2500, 1800, 800,    # Ocean Conservation (by scale) - highest water savings
         ])
 
-        X_transformed = X.copy()
-        X_transformed[:, 0] = np.log1p(X[:, 0])
-        self.scaler.fit(X_transformed)
-        X_transformed = self.scaler.transform(X_transformed)
+        # Add interaction term to the training data
+        interaction_term = X[:, 0] * X[:, 11]  # investment_amount * project_duration_months
+        X = np.hstack((X, interaction_term.reshape(-1, 1)))  # Add interaction term as a new feature
+
+        # Normalize the investment amounts and interaction term in the training data
+        X[:, 0] = np.log1p(X[:, 0])  # Apply log transformation to scale down large values
+        X[:, -1] = np.log1p(X[:, -1])  # Apply log transformation to the interaction term
+
+        # Fit the scaler on the normalized training data
+        self.scaler.fit(X)
+        X_transformed = self.scaler.transform(X)
 
         self.model_carbon.fit(X_transformed, y_carbon)
         self.model_energy.fit(X_transformed, y_energy)
         self.model_water.fit(X_transformed, y_water)
+
+        print("Feature importance (carbon model):", self.model_carbon.feature_importances_)
+        print("Feature importance (energy model):", self.model_energy.feature_importances_)
+        print("Feature importance (water model):", self.model_water.feature_importances_)
 
         os.makedirs(os.path.dirname(self.model_file_carbon), exist_ok=True)
         with open(self.model_file_carbon, 'wb') as f:
@@ -169,89 +181,201 @@ class ImpactCalculator:
         with open(self.scaler_file, 'wb') as f:
             pickle.dump(self.scaler, f)
 
-    def load_or_train_model(self):
-        try:
-            # Check if all necessary files exist
-            if all(os.path.exists(f) for f in [self.model_file_carbon, self.model_file_energy, self.model_file_water, self.scaler_file]):
-                with open(self.model_file_carbon, 'rb') as f:
-                    self.model_carbon = pickle.load(f)
-                with open(self.model_file_energy, 'rb') as f:
-                    self.model_energy = pickle.load(f)
-                with open(self.model_file_water, 'rb') as f:
-                    self.model_water = pickle.load(f)
-                with open(self.scaler_file, 'rb') as f:
-                    self.scaler = pickle.load(f)
-            else:
-                print("One or more model/scaler files missing. Training new models...")
-                self.train_model()
-        except Exception as e:
-            print(f"Failed to load models or scaler: {e}. Training new models...")
-            self.train_model()
-
-    def predict_impact(self, investment_amount, category_names, project_duration_months=12, project_scale=1, location='North India', technology_type=None):
+    def predict_impact(self, investment_amount, category_names, project_duration_months=12, project_scale=1, location='North India', technology_type='Manual'):
         investment_amount = float(investment_amount)
-        locations = ['North India', 'South India', 'East India', 'West India']
-        technologies = ['Solar', 'Wind', 'Hydro', 'Organic', 'Mechanical', 'Chemical', 'Biofuel', 'EV', 'Manual', 'AI']
-
-        location_map = {'India': 'North India', 'North America': 'West India'}
-        mapped_location = location_map.get(location, location if location in locations else 'North India')
+        mapped_location = location if location in self.label_encoder_location.classes_ else 'Uttar Pradesh'
         location_encoded = self.label_encoder_location.transform([mapped_location])[0]
-
-        tech_map = {'Filtration': 'Manual', 'Recycling Tech': 'Mechanical'}
-        mapped_tech = tech_map.get(technology_type, technology_type if technology_type in technologies else 'Manual')
+        mapped_tech = technology_type if technology_type in self.label_encoder_technology.classes_ else 'Manual'
         technology_encoded = self.label_encoder_technology.transform([mapped_tech])[0]
 
-        if not category_names:
-            category_names = ['Green Technology']
         category_vector = [1 if cat in category_names else 0 for cat in self.categories]
+        
+        # Correctly find the primary category index by matching with category_names
+        primary_category_index = -1
+        for i, cat in enumerate(self.categories):
+            if cat in category_names:
+                primary_category_index = i
+                break
+                
+        print(f"Category names: {category_names}")
+        print(f"Category vector: {category_vector}")
+        print(f"Selected primary category: {self.categories[primary_category_index] if primary_category_index >= 0 else 'None'}")
+        print(f"Primary index: {primary_category_index}")
 
-        X = np.array([[investment_amount] + category_vector + [project_duration_months, project_scale, location_encoded, technology_encoded]])
+        # Duration scaling factor - normalized to 12-month baseline
+        if project_duration_months <= 12:
+            duration_factor = project_duration_months / 12.0
+        else:
+            duration_factor = 1.0 + (np.sqrt(project_duration_months / 12.0) - 1.0) * 0.5
+        
+        # Scale factor based on project scale (1-10) with diminishing returns for larger scales
+        scale_factor = 0.3 + 0.7 * (project_scale ** 0.4)  # Using power of 0.4 for less aggressive scaling
+        
+        # Calculate realistic base metrics by category - ADJUSTED TO MORE CONSERVATIVE ANNUAL VALUES
+        # These are reference values per ₹1,000 for a 12-month, scale=1 project
+        renewable_energy_base = {
+            'carbon': 45,   # kg CO₂ 
+            'energy': 50,   # kWh
+            'water': 0,     # L
+        }
+        
+        emission_control_base = {
+            'carbon': 350,   # kg CO₂
+            'energy': 80,    # kWh
+            'water': 100,    # L
+        }
+        
+        water_conservation_base = {
+            'carbon': 80,    # kg CO₂
+            'energy': 30,    # kWh
+            'water': 1500,   # L
+        }
+        
+        recycling_base = {
+            'carbon': 200,   # kg CO₂
+            'energy': 120,   # kWh
+            'water': 200,    # L
+        }
+        
+        reforestation_base = {
+            'carbon': 500,   # kg CO₂
+            'energy': 0,     # kWh
+            'water': 1000,   # L
+        }
+        
+        clean_transportation_base = {
+            'carbon': 300,   # kg CO₂
+            'energy': 250,   # kWh
+            'water': 0,      # L
+        }
+        
+        ocean_conservation_base = {
+            'carbon': 150,   # kg CO₂
+            'energy': 0,     # kWh
+            'water': 1200,   # L
+        }
+        
+        waste_management_base = {
+            'carbon': 220,   # kg CO₂
+            'energy': 180,   # kWh
+            'water': 100,    # L
+        }
+        
+        green_technology_base = {
+            'carbon': 150,   # kg CO₂
+            'energy': 220,   # kWh
+            'water': 50,     # L
+        }
+
+        # Prepare model input data for fallback case
+        interaction_term = investment_amount * project_duration_months
+        X = np.array([[investment_amount, interaction_term] + category_vector + [project_duration_months, project_scale, location_encoded, technology_encoded]])
+        
         X_transformed = X.copy()
         X_transformed[:, 0] = np.log1p(X[:, 0])
-        X_transformed = self.scaler.transform(X_transformed)  # This line requires a fitted scaler
+        X_transformed[:, 1] = np.log1p(X[:, 1])
+        X_transformed = self.scaler.transform(X_transformed)
 
-        carbon_reduced = max(0, self.model_carbon.predict(X_transformed)[0])
-        energy_saved = max(0, self.model_energy.predict(X_transformed)[0])
-        water_conserved = max(0, self.model_water.predict(X_transformed)[0])
+        # Category-specific logic takes priority over model predictions
+        if primary_category_index == 4:  # Reforestation (corrected from 5)
+            carbon_reduced = reforestation_base['carbon'] * scale_factor * duration_factor
+            energy_saved = 0  # Enforce zero energy impact for reforestation
+            water_conserved = 1000 * scale_factor * duration_factor  # Hardcode base 1000 L
+            
+            # Apply location-based water boost directly for more control
+            if mapped_location in ["Assam", "Kerala", "Meghalaya", "West Bengal", "Nagaland"]:  # Added Nagaland
+                water_conserved *= 1.2  # High rainfall regions boost
+                
+        elif primary_category_index == 0:  # Renewable Energy
+            tech_multiplier = 1.15 if "Solar" in mapped_tech else (0.9 if "Wind" in mapped_tech else 0.8)
+            carbon_reduced = renewable_energy_base['carbon'] * scale_factor * duration_factor * tech_multiplier
+            energy_saved = renewable_energy_base['energy'] * scale_factor * duration_factor * tech_multiplier
+            water_conserved = 0  # Zero water impact for renewable energy
+            
+            # For larger renewable projects, apply more modest boost
+            if project_scale >= 5:
+                energy_saved *= 1.2
+                
+        elif primary_category_index == 2:  # Emission Control
+            carbon_reduced = emission_control_base['carbon'] * scale_factor * duration_factor
+            energy_saved = emission_control_base['energy'] * scale_factor * duration_factor
+            water_conserved = emission_control_base['water'] * scale_factor * duration_factor
+            
+            # For large emission control projects, use fixed value as recommended
+            if project_scale >= 4:
+                carbon_reduced = 1500  # Fixed value as recommended
+            
+        elif primary_category_index == 3:  # Water Conservation
+            carbon_reduced = water_conservation_base['carbon'] * scale_factor * duration_factor
+            energy_saved = water_conservation_base['energy'] * scale_factor * duration_factor
+            water_conserved = water_conservation_base['water'] * scale_factor * duration_factor
+            
+            # Location-based boost for high-rainfall regions
+            if mapped_location in ["Assam", "Kerala", "Meghalaya"]:
+                water_conserved *= 1.15
+            
+        elif primary_category_index == 1:  # Recycling
+            carbon_reduced = recycling_base['carbon'] * scale_factor * duration_factor
+            energy_saved = recycling_base['energy'] * scale_factor * duration_factor
+            water_conserved = recycling_base['water'] * scale_factor * duration_factor
+            
+        elif primary_category_index == 6:  # Clean Transportation
+            carbon_reduced = clean_transportation_base['carbon'] * scale_factor * duration_factor
+            energy_saved = clean_transportation_base['energy'] * scale_factor * duration_factor
+            water_conserved = 0  # Zero water impact for clean transportation
+            
+        elif primary_category_index == 9:  # Ocean Conservation
+            carbon_reduced = ocean_conservation_base['carbon'] * scale_factor * duration_factor
+            energy_saved = 0  # Zero energy impact for ocean conservation
+            water_conserved = ocean_conservation_base['water'] * scale_factor * duration_factor
+            
+        elif primary_category_index == 7:  # Waste Management
+            carbon_reduced = waste_management_base['carbon'] * scale_factor * duration_factor
+            energy_saved = waste_management_base['energy'] * scale_factor * duration_factor
+            water_conserved = waste_management_base['water'] * scale_factor * duration_factor
+            
+        elif primary_category_index == 8:  # Green Technology
+            carbon_reduced = green_technology_base['carbon'] * scale_factor * duration_factor
+            energy_saved = green_technology_base['energy'] * scale_factor * duration_factor
+            water_conserved = green_technology_base['water'] * scale_factor * duration_factor
+            
+            if "AI" in technology_type:
+                water_conserved = 0  # Zero water impact for AI-based green tech
+        else:
+            # Fallback to model predictions only if no category is matched
+            carbon_reduced = max(0, self.model_carbon.predict(X_transformed)[0])
+            energy_saved = max(0, self.model_energy.predict(X_transformed)[0])
+            water_conserved = max(0, self.model_water.predict(X_transformed)[0])
+            print("Using model fallback for predictions")
 
-        base_investment = 15000
-        scaling_factor = investment_amount / base_investment
-
-        if 'Water Conservation' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 500 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 300 * scaling_factor)
-            water_conserved = min(water_conserved * scaling_factor, 600000 * scaling_factor)
-        elif 'Waste Management' in category_names or 'Recycling' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 1000 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 2000 * scaling_factor)
-            water_conserved = 0
-        elif 'Reforestation' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 1000 * scaling_factor)
+        # Location-specific adjustments
+        if mapped_location in ["Rajasthan", "Gujarat"] and primary_category_index == 0:
+            # Higher solar efficiency in these regions
+            energy_saved *= 1.1
+            
+        # Add small random variation (±5%) to avoid identical values for similar projects
+        variation_factor = 1.0 + (np.random.random() - 0.5) * 0.1
+        carbon_reduced *= variation_factor
+        energy_saved *= 1.0 + (np.random.random() - 0.5) * 0.1
+        water_conserved *= 1.0 + (np.random.random() - 0.5) * 0.1
+        
+        # Final guarantee that energy is zero for specific categories
+        if primary_category_index in [5, 9]:  # Reforestation or Ocean Conservation
             energy_saved = 0
-            water_conserved = 0
-        elif 'Clean Transportation' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 750 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 2000 * scaling_factor)
-            water_conserved = 0
-        elif 'Sustainable Agriculture' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 500 * scaling_factor)
-            energy_saved = 0
-            water_conserved = min(water_conserved * scaling_factor, 10000 * scaling_factor)
-        elif 'Emission Control' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 1000 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 750 * scaling_factor)
-            water_conserved = 0
-        elif 'Green Technology' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 1000 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 1500 * scaling_factor)
-            water_conserved = 0
-        elif 'Ocean Conservation' in category_names:
-            carbon_reduced = min(carbon_reduced * scaling_factor, 750 * scaling_factor)
-            energy_saved = 0
-            water_conserved = 0
-        else:  # Default (Renewable Energy)
-            carbon_reduced = min(carbon_reduced * scaling_factor, 2000 * scaling_factor)
-            energy_saved = min(energy_saved * scaling_factor, 4000 * scaling_factor)
-            water_conserved = 0
-
-        return carbon_reduced, energy_saved, water_conserved
+            
+        # Ensure values can't go below zero after variation
+        carbon_reduced = max(0, carbon_reduced)
+        energy_saved = max(0, energy_saved)
+        water_conserved = max(0, water_conserved)
+        
+        # Log impact calculation details
+        print(f"Category: {category_names}, Primary Index: {primary_category_index}")
+        print(f"Scale Factor: {scale_factor}, Duration Factor: {duration_factor}")
+        print(f"Final Impact - Carbon: {carbon_reduced}, Energy: {energy_saved}, Water: {water_conserved}")
+        
+        # Return the final impact metrics
+        return {
+            "carbon": round(carbon_reduced, 2),
+            "energy": round(energy_saved, 2),
+            "water": round(water_conserved, 2)
+        }

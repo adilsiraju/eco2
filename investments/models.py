@@ -45,28 +45,31 @@ class Investment(models.Model):
     
     @staticmethod
     def calculate_impact_for_amount(initiative, amount):
-        """Calculate hypothetical impact for a given amount and initiative without instantiation"""
-        try:
-            calculator = ImpactCalculator()
-            categories = [cat.name for cat in initiative.categories.all()]
-            
-            carbon, energy, water = calculator.predict_impact(
-                investment_amount=float(amount),
-                category_names=categories,
-                project_duration_months=initiative.duration_months,
-                project_scale=initiative.project_scale,
-                location=initiative.location,
-                technology_type=initiative.technology_type
-            )
-            
-            return {
-                'carbon': carbon,
-                'energy': energy,
-                'water': water
-            }
-        except Exception as e:
-            print(f"Impact calculation failed: {str(e)}")
-            return {'carbon': 0, 'energy': 0, 'water': 0}  # Fallback values
+        """Calculate environmental impact for a given investment amount"""
+        from .impact_calculator import ImpactCalculator
+        
+        calculator = ImpactCalculator()
+        category_names = [category.name for category in initiative.categories.all()]
+        
+        # Calculate impact metrics based on initiative details
+        impact = calculator.predict_impact(
+            investment_amount=amount,
+            category_names=category_names,
+            project_duration_months=initiative.duration_months,
+            project_scale=initiative.project_scale,
+            location=initiative.location,
+            technology_type=initiative.technology_type
+        )
+        
+        # Only update stored metrics if we're in a "calculate and store" operation mode
+        # For normal predictions, we always return the freshly calculated values
+        if amount == 1000 and getattr(initiative, '_store_metrics', False):
+            initiative.carbon_reduction_per_investment = impact['carbon']
+            initiative.energy_savings_per_investment = impact['energy']
+            initiative.water_savings_per_investment = impact['water']
+            initiative.save()
+        
+        return impact
     
     def save(self, *args, **kwargs):
         # Calculate impacts using centralized method

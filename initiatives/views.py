@@ -42,8 +42,9 @@ def initiative_list(request):
     total_carbon = 0
     for initiative in initiatives:
         impact = Investment.calculate_impact_for_amount(initiative, 1000)
-        initiative.impact_for_1000 = {k: round(v) for k, v in impact.items()}
-        total_carbon += initiative.impact_for_1000['carbon']
+        print(f"Initiative: {initiative.title}, Predicted Impact: {impact}")  # Debugging log
+        initiative.impact_for_1000 = {k: round(float(v), 2) for k, v in impact.items()}  # Ensure numeric values
+        total_carbon += initiative.impact_for_1000.get('carbon', 0)
     
     # Pagination
     paginator = Paginator(initiatives, 9)
@@ -65,7 +66,7 @@ def initiative_detail(request, pk):
     
     # Calculate impact for ₹1000 using static method
     impact_metrics = Investment.calculate_impact_for_amount(initiative, 1000)
-    impact_metrics = {k: round(v) for k, v in impact_metrics.items()}
+    impact_metrics = {k: round(float(v), 2) for k, v in impact_metrics.items()}
     
     # Get recent investments
     recent_investments = initiative.investments.all().order_by('-created_at')[:5]

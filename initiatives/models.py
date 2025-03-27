@@ -30,10 +30,34 @@ class Initiative(models.Model):
         ('cancelled', 'Cancelled')
     ]
     LOCATION_CHOICES = [
-        ('North India', 'North India'),
-        ('South India', 'South India'),
-        ('East India', 'East India'),
-        ('West India', 'West India'),
+        ('Andhra Pradesh', 'Andhra Pradesh'),
+        ('Arunachal Pradesh', 'Arunachal Pradesh'),
+        ('Assam', 'Assam'),
+        ('Bihar', 'Bihar'),
+        ('Chhattisgarh', 'Chhattisgarh'),
+        ('Goa', 'Goa'),
+        ('Gujarat', 'Gujarat'),
+        ('Haryana', 'Haryana'),
+        ('Himachal Pradesh', 'Himachal Pradesh'),
+        ('Jharkhand', 'Jharkhand'),
+        ('Karnataka', 'Karnataka'),
+        ('Kerala', 'Kerala'),
+        ('Madhya Pradesh', 'Madhya Pradesh'),
+        ('Maharashtra', 'Maharashtra'),
+        ('Manipur', 'Manipur'),
+        ('Meghalaya', 'Meghalaya'),
+        ('Mizoram', 'Mizoram'),
+        ('Nagaland', 'Nagaland'),
+        ('Odisha', 'Odisha'),
+        ('Punjab', 'Punjab'),
+        ('Rajasthan', 'Rajasthan'),
+        ('Sikkim', 'Sikkim'),
+        ('Tamil Nadu', 'Tamil Nadu'),
+        ('Telangana', 'Telangana'),
+        ('Tripura', 'Tripura'),
+        ('Uttar Pradesh', 'Uttar Pradesh'),
+        ('Uttarakhand', 'Uttarakhand'),
+        ('West Bengal', 'West Bengal')
     ]
     TECHNOLOGY_CHOICES = [
         ('Solar', 'Solar'),
@@ -57,7 +81,7 @@ class Initiative(models.Model):
     categories = models.ManyToManyField(Category, related_name='initiatives')
     image = models.ImageField(upload_to='initiatives/', null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
-    location = models.CharField(max_length=100)
+    location = models.CharField(max_length=100, choices=LOCATION_CHOICES, default='Karnataka')
     technology_type = models.CharField(max_length=20, choices=TECHNOLOGY_CHOICES, default='Manual')
     goal_amount = models.DecimalField(max_digits=12, decimal_places=2)
     current_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
