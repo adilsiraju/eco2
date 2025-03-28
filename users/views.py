@@ -21,20 +21,23 @@ from onboarding.models import OnboardingProgress, UserPreference
 
 def register(request):
     if request.method == 'POST':
+        print("\n==== REGISTRATION POST DATA ====")
+        print(f"POST: {request.POST}")
+        print(f"FILES: {request.FILES}")
+        
         form = EnhancedRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
+            print("\n==== FORM VALID ====")
+            print(f"CLEANED DATA: {form.cleaned_data}")
             
-            # Log the user in
+            user = form.save()  # Saves both user and profile
+            print(f"USER CREATED: {user.username}, ID: {user.id}")
+            print(f"PROFILE DATA: Phone: {user.profile.phone_number}, Address: {user.profile.address_line1}")
+            
             login(request, user)
-            
-            # Create onboarding progress entry for the new user
             OnboardingProgress.objects.get_or_create(user=user)
-            
-            # Redirect to the first step of onboarding
             return redirect('onboarding_welcome')
         else:
-            # If form is invalid, add form error information to be displayed in the template
             print("Form validation errors:", form.errors)
     else:
         form = EnhancedRegistrationForm()
@@ -146,7 +149,7 @@ def dashboard(request):
     grouped_investments = {}
     for investment in investments:
         initiative_id = investment.initiative.id
-        if initiative_id not in grouped_investments:
+        if (initiative_id) not in grouped_investments:
             grouped_investments[initiative_id] = {
                 'initiative': investment.initiative,
                 'total_amount': 0,
@@ -212,6 +215,9 @@ def dashboard(request):
 
 @login_required
 def profile(request):
+    # Get or create the profile to ensure it exists
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
     if request.method == 'POST':
         # Check if profile image is being updated
         if 'profile_image' in request.FILES:
@@ -234,7 +240,7 @@ def profile(request):
                 messages.error(request, 'Please correct the errors below.')
                 # Pass the password form with errors to the template
                 user_form = UserUpdateForm(instance=request.user)
-                profile_form = UserProfileForm(instance=request.user.profile)
+                profile_form = UserProfileForm(instance=profile)
                 context = {
                     'user_form': user_form, 
                     'profile_form': profile_form, 
@@ -244,7 +250,7 @@ def profile(request):
                 
         # Handle profile update
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
@@ -255,7 +261,7 @@ def profile(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
+        profile_form = UserProfileForm(instance=profile)
         password_form = PasswordChangeForm(request.user)
     
     context = {

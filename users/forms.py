@@ -157,24 +157,30 @@ class EnhancedRegistrationForm(forms.ModelForm):
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
     
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return cleaned_data
+
     def save(self, commit=True):
-        # First save the User
+        # Save the CustomUser instance
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        
         if commit:
             user.save()
-            
-            # Now create or update the profile
+            # Create or update the Profile instance
             profile, created = Profile.objects.get_or_create(user=user)
-            profile.profile_image = self.cleaned_data.get('profile_image')
-            profile.phone_number = self.cleaned_data.get('phone_number')
-            profile.address_line1 = self.cleaned_data.get('address_line1')
-            profile.address_line2 = self.cleaned_data.get('address_line2')
-            profile.city = self.cleaned_data.get('city')
-            profile.state = self.cleaned_data.get('state')
-            profile.postal_code = self.cleaned_data.get('postal_code')
-            profile.country = self.cleaned_data.get('country')
+            profile.phone_number = self.cleaned_data.get('phone_number', '')
+            profile.address_line1 = self.cleaned_data.get('address_line1', '')
+            profile.address_line2 = self.cleaned_data.get('address_line2', '')
+            profile.city = self.cleaned_data.get('city', '')
+            profile.state = self.cleaned_data.get('state', '')
+            profile.postal_code = self.cleaned_data.get('postal_code', '')
+            profile.country = self.cleaned_data.get('country', '')
+            if 'profile_image' in self.files:
+                profile.profile_image = self.files['profile_image']
             profile.save()
-            
         return user
