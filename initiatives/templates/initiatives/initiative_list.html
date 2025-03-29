@@ -8,121 +8,294 @@
     .hero {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
-        padding: 4rem 0;
-        margin-bottom: 2rem;
+        padding: 2.5rem 0;
+        margin-bottom: 1.5rem;
     }
     .stat-card {
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 1.5rem;
+        border-radius: 8px;
+        padding: 1rem;
         text-align: center;
         backdrop-filter: blur(10px);
     }
     .stat-card i {
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
         opacity: 0.9;
     }
     .stat-card h3 {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
     }
     .stat-card p {
         margin: 0;
         opacity: 0.9;
+        font-size: 0.9rem;
     }
     .filter-section {
         background: white;
-        padding: 1.5rem;
-        border-radius: 10px;
+        padding: 1rem;
+        border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
+    .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    .form-select, .form-control {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.5rem;
+    }
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    /* New simplified card design */
     .initiative-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease;
+        transition: transform 0.2s ease;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
     }
     .initiative-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-3px);
     }
     .initiative-image {
-        height: 200px;
+        height: 140px;
         object-fit: cover;
         width: 100%;
     }
     .initiative-content {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .initiative-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    .initiative-title-area {
+        flex: 1;
     }
     .initiative-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
         color: #2c3e50;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .initiative-status {
+        margin-left: 0.5rem;
     }
     .initiative-description {
         color: #6c757d;
         margin-bottom: 1rem;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    .funding-info {
+        margin-bottom: 0.75rem;
+    }
+    .funding-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
     }
     .progress {
-        height: 15px;
-        margin-bottom: 1rem;
-        border-radius: 6px;
+        height: 6px;
+        margin-bottom: 0.5rem;
+        border-radius: 3px;
     }
     .progress-bar {
-        border-radius: 6px;
+        border-radius: 3px;
     }
-    .impact-stats {
+    .initiative-meta {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-    .impact-stat {
-        display: flex;
-        align-items: center;
+        flex-wrap: wrap;
         gap: 0.5rem;
+        margin-top: auto;
     }
-    .impact-stat i {
-        color: #28a745;
-    }
-    .initiative-footer {
-        display: flex;
-        justify-content: space-between;
+    .initiative-tag {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 12px;
+        background: #f0f0f0;
+        color: #555;
+        display: inline-flex;
         align-items: center;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #eee;
+        gap: 0.25rem;
     }
-    .location {
-        color: #6c757d;
-        font-size: 0.9rem;
+    .initiative-tag.location {
+        background: #f5f5f5;
+    }
+    .initiative-tag.investment {
+        background: #e8f5e9;
+        color: #2e7d32;
     }
     .btn-learn-more {
         background: #28a745;
         color: white;
-        padding: 0.5rem 1rem;
+        padding: 0.375rem 0.75rem;
         border-radius: 5px;
         text-decoration: none;
         transition: background-color 0.3s ease;
+        font-size: 0.85rem;
+        margin-top: 1rem;
+        text-align: center;
+        display: block;
     }
     .btn-learn-more:hover {
         background: #218838;
         color: white;
     }
+    
+    /* Details toggle section */
+    .details-toggle {
+        color: #28a745;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.5rem;
+        user-select: none;
+    }
+    .initiative-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    .initiative-details.show {
+        max-height: 500px;
+    }
+    .detail-section {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #eee;
+    }
+    .impact-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    .impact-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .impact-stat i {
+        color: #28a745;
+        font-size: 0.8rem;
+    }
+    
+    /* Other styles */
+    .row.g-3 {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 1.5rem;
+    }
+    .filter-form-container {
+        transition: max-height 0.3s ease;
+        max-height: 65px;
+        overflow: hidden;
+    }
+    .filter-form-container.expanded {
+        max-height: 300px;
+    }
+    .collapse-toggle {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .filter-chip {
+        background: #f0f0f0;
+        border-radius: 16px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .filter-chip i {
+        cursor: pointer;
+    }
+    
+    /* View toggle */
+    .view-toggle {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    .view-toggle-btn {
+        padding: 0.25rem 0.75rem;
+        background: #f0f0f0;
+        border: none;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    .view-toggle-btn:first-child {
+        border-radius: 4px 0 0 4px;
+    }
+    .view-toggle-btn:last-child {
+        border-radius: 0 4px 4px 0;
+    }
+    .view-toggle-btn.active {
+        background: #28a745;
+        color: white;
+    }
+    .compact-view .initiative-card {
+        flex-direction: row;
+        height: auto;
+    }
+    .compact-view .initiative-image {
+        width: 25%;
+        height: auto;
+    }
+    .compact-view .initiative-content {
+        width: 75%;
+    }
+    .compact-view .initiative-description {
+        -webkit-line-clamp: 1;
+    }
+    
+    /* Pagination styling */
     .pagination {
-        margin-top: 2rem;
+        margin-top: 1.5rem;
     }
     .page-link {
         color: #28a745;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.9rem;
     }
     .page-item.active .page-link {
         background-color: #28a745;
@@ -135,7 +308,7 @@
 <!-- Hero Section -->
 <div class="hero">
     <div class="container">
-        <div class="row">
+        <div class="row g-2">
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-project-diagram"></i>
@@ -171,51 +344,109 @@
 <div class="container">
     <!-- Filter Section -->
     <div class="filter-section">
-        <form method="get" class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Category</label>
-                <select name="category" class="form-select">
-                    <option value="">All Categories</option>
-                    {% for category in categories %}
-                    <option value="{{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>
-                        {{ category.name }}
-                    </option>
-                    {% endfor %}
-                </select>
+        <!-- Active Filters Row -->
+        {% if request.GET.category or request.GET.status or request.GET.sort or request.GET.search %}
+        <div class="filter-row">
+            <span class="small text-muted me-2">Active Filters:</span>
+            {% if request.GET.category %}
+            <div class="filter-chip">
+                Category: {{ request.GET.category }} 
+                <a href="?{% if request.GET.status %}status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-times-circle text-muted"></i>
+                </a>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                    <option value="">All Status</option>
-                    {% for value, label in initiatives.0.STATUS_CHOICES %}
-                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                    {% endfor %}
-                </select>
+            {% endif %}
+            {% if request.GET.status %}
+            <div class="filter-chip">
+                Status: {{ request.GET.status|title }} 
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-times-circle text-muted"></i>
+                </a>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Sort By</label>
-                <select name="sort" class="form-select">
-                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
-                    <option value="progress" {% if request.GET.sort == 'progress' %}selected{% endif %}>Progress</option>
-                    <option value="amount" {% if request.GET.sort == 'amount' %}selected{% endif %}>Amount</option>
-                </select>
+            {% endif %}
+            {% if request.GET.search %}
+            <div class="filter-chip">
+                "{{ request.GET.search }}" 
+                <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                    <i class="fas fa-times-circle text-muted"></i>
+                </a>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Search</label>
-                <input type="text" name="search" class="form-control" placeholder="Search initiatives..." value="{{ request.GET.search }}">
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Apply Filters</button>
-            </div>
-        </form>
+            {% endif %}
+            <a href="?" class="filter-chip bg-light">
+                <i class="fas fa-undo"></i> Reset all
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Collapsible Filter Toggle -->
+        <div class="collapse-toggle" id="filterToggle">
+            <span><i class="fas fa-filter"></i> Filter and Sort</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        
+        <!-- Filter Form (Collapsible) -->
+        <div class="filter-form-container" id="filterForm">
+            <form method="get" class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        {% for value, label in initiatives.0.STATUS_CHOICES %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sort By</label>
+                    <select name="sort" class="form-select">
+                        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="progress" {% if request.GET.sort == 'progress' %}selected{% endif %}>Progress</option>
+                        <option value="amount" {% if request.GET.sort == 'amount' %}selected{% endif %}>Amount</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Search</label>
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ request.GET.search }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Initiatives Grid -->
-    <div class="row g-4">
+    <!-- View Toggle -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Showing {{ initiatives.count }} initiatives</h5>
+        <div class="view-toggle">
+            <button class="view-toggle-btn active" data-view="grid">
+                <i class="fas fa-th-large"></i> Grid
+            </button>
+            <button class="view-toggle-btn" data-view="compact">
+                <i class="fas fa-list"></i> Compact
+            </button>
+        </div>
+    </div>
+
+    <!-- Initiatives Grid - Redesigned -->
+    <div class="row g-3" id="initiatives-container">
         {% for initiative in initiatives %}
-        <div class="col-md-4">
+        <div class="col-lg-4 col-md-6">
             <div class="initiative-card">
                 {% if initiative.image %}
                 <img src="{{ initiative.image.url }}" alt="{{ initiative.title }}" class="initiative-image">
@@ -223,62 +454,121 @@
                 <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="initiative-image">
                 {% endif %}
                 <div class="initiative-content">
-                    <h3 class="initiative-title">{{ initiative.title }}</h3>
-                    <p class="initiative-description">{{ initiative.description|truncatewords:30 }}</p>
-                    
-                    <div class="progress">
-                        <div class="progress-bar bg-success" role="progressbar" 
-                             style="width: {{ initiative.get_progress_percentage }}%"
-                             aria-valuenow="{{ initiative.get_progress_percentage }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                            {{ initiative.get_progress_percentage|floatformat:1 }}%
+                    <div class="initiative-header">
+                        <div class="initiative-title-area">
+                            <h3 class="initiative-title" title="{{ initiative.title }}">{{ initiative.title }}</h3>
+                            <div class="d-flex align-items-center">
+                                {% for category in initiative.categories.all|slice:":1" %}
+                                <span class="badge bg-success">{{ category.name }}</span>
+                                {% endfor %}
+                                {% if initiative.categories.all|length > 1 %}
+                                <span class="badge bg-secondary ms-1">+{{ initiative.categories.all|length|add:"-1" }}</span>
+                                {% endif %}
+                            </div>
                         </div>
+                        <span class="initiative-status badge {% if initiative.status == 'active' %}bg-primary{% elif initiative.status == 'completed' %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ initiative.get_status_display }}
+                        </span>
                     </div>
                     
-                    <div class="impact-stats">
-                        <div class="impact-stat">
-                            <i class="fas fa-cloud"></i>
-                            {{ initiative.impact_for_1000.carbon|intcomma }}{% if initiative.impact_for_1000.carbon|floatformat %} kg{% endif %}
+                    <p class="initiative-description">{{ initiative.description|truncatewords:20 }}</p>
+                    
+                    <div class="funding-info">
+                        <div class="funding-row">
+                            <span class="text-success fw-bold">₹{{ initiative.current_amount|intcomma }}</span>
+                            <span class="text-muted">of ₹{{ initiative.goal_amount|intcomma }}</span>
                         </div>
-                        <div class="impact-stat">
-                            <i class="fas fa-bolt"></i>
-                            {{ initiative.impact_for_1000.energy|intcomma }}{% if initiative.impact_for_1000.energy|floatformat %} kWh{% endif %}
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ initiative.get_progress_percentage }}%"
+                                 aria-valuenow="{{ initiative.get_progress_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
                         </div>
-                        <div class="impact-stat">
-                            <i class="fas fa-tint"></i>
-                            {{ initiative.impact_for_1000.water|intcomma }}{% if initiative.impact_for_1000.water|floatformat %} L{% endif %}
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>Progress</span>
+                            <span>{{ initiative.get_progress_percentage|floatformat:1 }}%</span>
                         </div>
-                    </div>
-                    <div class="text-muted small mb-2">
-                        Impact per ₹1,000 investment
                     </div>
                     
-                    <div class="initiative-footer">
-                        <div class="location">
-                            <i class="fas fa-map-marker-alt"></i> {{ initiative.location }}
+                    <div class="initiative-meta">
+                        <div class="initiative-tag investment">
+                            <i class="fas fa-rupee-sign"></i>
+                            Min: ₹{{ initiative.min_investment|intcomma }}
                         </div>
-                        <a href="{% url 'initiative_detail' initiative.pk %}" class="btn-learn-more">
-                            Learn More
-                        </a>
+                        
+                        <div class="initiative-tag location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ initiative.location }}
+                        </div>
                     </div>
+                    
+                    <div class="details-toggle" data-initiative="{{ initiative.pk }}">
+                        <span class="toggle-text">Show details</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="initiative-details" id="details-{{ initiative.pk }}">
+                        <div class="detail-section">
+                            <div class="impact-stats">
+                                <div class="impact-stat" title="Carbon Impact">
+                                    <i class="fas fa-cloud"></i>
+                                    {{ initiative.impact_for_1000.carbon|intcomma }}
+                                </div>
+                                <div class="impact-stat" title="Energy Impact">
+                                    <i class="fas fa-bolt"></i>
+                                    {{ initiative.impact_for_1000.energy|intcomma }}
+                                </div>
+                                <div class="impact-stat" title="Water Impact">
+                                    <i class="fas fa-tint"></i>
+                                    {{ initiative.impact_for_1000.water|intcomma }}
+                                </div>
+                            </div>
+                            <div class="text-muted small mb-2">
+                                <i class="fas fa-info-circle"></i> Impact per ₹1,000 investment
+                            </div>
+                            
+                            {% if initiative.duration_months %}
+                            <div class="text-muted small mb-1">
+                                <i class="fas fa-clock"></i> Duration: {{ initiative.duration_months }} months
+                            </div>
+                            {% endif %}
+                            
+                            {% if initiative.technology_type %}
+                            <div class="text-muted small">
+                                <i class="fas fa-microchip"></i> Technology: {{ initiative.technology_type }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'initiative_detail' initiative.pk %}" class="btn-learn-more">
+                        Learn More
+                    </a>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center">
-            <p class="text-muted">No initiatives found matching your criteria.</p>
+            <div class="p-4 bg-light rounded">
+                <i class="fas fa-search fa-2x text-muted mb-2"></i>
+                <p class="text-muted">No initiatives found matching your criteria.</p>
+                <a href="?" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+            </div>
         </div>
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if initiatives.has_other_pages %}
-    <nav aria-label="Page navigation" class="pagination justify-content-center">
-        <ul class="pagination">
+    <nav aria-label="Page navigation" class="mt-3">
+        <ul class="pagination pagination-sm justify-content-center">
             {% if initiatives.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ initiatives.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
+                <a class="page-link" href="?page={{ initiatives.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
             </li>
             {% endif %}
             
@@ -290,11 +580,78 @@
             
             {% if initiatives.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ initiatives.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
+                <a class="page-link" href="?page={{ initiatives.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
             </li>
             {% endif %}
         </ul>
     </nav>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter toggle functionality
+        const filterToggle = document.getElementById('filterToggle');
+        const filterForm = document.getElementById('filterForm');
+        const filterIcon = filterToggle.querySelector('.fas.fa-chevron-down');
+        
+        filterToggle.addEventListener('click', function() {
+            filterForm.classList.toggle('expanded');
+            filterIcon.classList.toggle('fa-chevron-down');
+            filterIcon.classList.toggle('fa-chevron-up');
+        });
+
+        // If there are active filters, expand the form by default
+        {% if request.GET.category or request.GET.status or request.GET.sort or request.GET.search %}
+            filterForm.classList.add('expanded');
+            filterIcon.classList.remove('fa-chevron-down');
+            filterIcon.classList.add('fa-chevron-up');
+        {% endif %}
+        
+        // Details toggle functionality
+        const detailsToggles = document.querySelectorAll('.details-toggle');
+        detailsToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const initiativeId = this.dataset.initiative;
+                const detailsEl = document.getElementById(`details-${initiativeId}`);
+                const toggleText = this.querySelector('.toggle-text');
+                const toggleIcon = this.querySelector('i');
+                
+                detailsEl.classList.toggle('show');
+                
+                if (detailsEl.classList.contains('show')) {
+                    toggleText.textContent = 'Hide details';
+                    toggleIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                } else {
+                    toggleText.textContent = 'Show details';
+                    toggleIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                }
+            });
+        });
+        
+        // View toggle functionality
+        const viewToggles = document.querySelectorAll('.view-toggle-btn');
+        const initiativesContainer = document.getElementById('initiatives-container');
+        
+        viewToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                // Update active state
+                viewToggles.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Change view
+                const viewType = this.dataset.view;
+                if (viewType === 'compact') {
+                    initiativesContainer.classList.add('compact-view');
+                } else {
+                    initiativesContainer.classList.remove('compact-view');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
