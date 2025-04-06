@@ -10,16 +10,16 @@
 
 /* Base styles with modern updates */
 body {
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Poppins', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: var(--dark-color);
     line-height: 1.6;
 }
 
-/* Enhanced navbar styling - increased specificity to prevent overrides */
+/* Enhanced navbar styling with landing page appearance */
 html body .navbar-custom {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background: linear-gradient(135deg, #155d27 0%, #25a244 100%) !important;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     padding: 1rem 0;
     position: sticky;
     top: 0;
@@ -29,12 +29,18 @@ html body .navbar-custom {
 
 html body .navbar-custom .navbar-brand {
     font-weight: 700;
-    color: var(--primary-color) !important;
+    color: white !important;
     font-size: 1.5rem;
+    transition: all 0.3s var(--transition-cubic);
+}
+
+html body .navbar-custom .navbar-brand:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
 
 html body .navbar-custom .nav-link {
-    color: var(--dark-color) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
     font-weight: 500;
     padding: 0.5rem 1rem !important;
     transition: all 0.3s var(--transition-cubic);
@@ -48,7 +54,7 @@ html body .navbar-custom .nav-link::after {
     left: 1rem;
     right: 1rem;
     height: 2px;
-    background: var(--primary-color);
+    background: white;
     transform: scaleX(0);
     transition: transform 0.3s var(--transition-cubic);
 }
@@ -62,35 +68,52 @@ html body .navbar-custom .navbar-toggler {
     border: none;
     padding: 0.25rem 0.75rem;
     font-size: 1.25rem;
+    color: white;
+}
+
+html body .navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 html body .navbar-custom .navbar-toggler:focus {
-    box-shadow: 0 0 0 0.15rem rgba(46, 204, 113, 0.25);
+    box-shadow: 0 0 0 0.15rem rgba(255, 255, 255, 0.25);
 }
 
 /* Active and hover nav states with !important to prevent overrides */
 html body .navbar-custom .nav-link:hover,
 html body .navbar-custom .nav-link.active {
-    color: var(--primary-color) !important;
+    color: white !important;
 }
 
 /* Navbar buttons with important flags to prevent overrides */
 html body .navbar-custom .btn-outline-primary {
-    color: var(--primary-color) !important;
-    border: 2px solid var(--primary-color) !important;
+    color: white !important;
+    border: 2px solid white !important;
     background: transparent !important;
+    border-radius: 50px !important;
+    padding: 0.75rem 1.75rem !important;
+    transition: all 0.3s ease !important;
 }
 
 html body .navbar-custom .btn-outline-primary:hover {
-    background: var(--primary-color) !important;
-    color: white !important;
-    border-color: var(--primary-color) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
 }
 
 html body .navbar-custom .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+    background: white !important;
+    color: #155d27 !important;
     border: none !important;
-    color: white !important;
+    border-radius: 50px !important;
+    padding: 0.75rem 1.75rem !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+html body .navbar-custom .btn-primary:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
 }
 
 /* Modern button styles */
