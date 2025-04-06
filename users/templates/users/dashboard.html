@@ -5,190 +5,402 @@
 
 {% block extra_css %}
 <style>
+    /* Modern Hero Section */
     .hero {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, #155d27 0%, #25a244 100%);
         color: white;
-        padding: 2.5rem 0; /* Reduced padding */
-        margin-bottom: 1.5rem; /* Reduced margin */
+        padding: 3rem 0 2.5rem;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{% static 'images/pattern.svg' %}") repeat;
+        opacity: 0.06;
+        animation: patternFloat 60s linear infinite;
+    }
+    
+    @keyframes patternFloat {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-100%); }
+    }
+    
     .stat-card {
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 8px; /* Slightly reduced */
-        padding: 1rem; /* Reduced padding */
+        border-radius: 16px;
+        padding: 1.2rem;
         text-align: center;
         backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        height: 100%;
     }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
     .stat-card i {
-        font-size: 1.5rem; /* Reduced size */
-        margin-bottom: 0.5rem; /* Reduced margin */
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
         opacity: 0.9;
     }
+    
     .stat-card h3 {
-        font-size: 1.5rem; /* Reduced font size */
-        margin-bottom: 0.25rem; /* Reduced margin */
+        font-size: 1.8rem;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
     }
+    
     .stat-card p {
         margin: 0;
         opacity: 0.9;
-        font-size: 0.9rem; /* Reduced font size */
+        font-size: 0.9rem;
     }
+    
+    /* Dashboard Card Design */
     .dashboard-card {
         background: white;
-        border-radius: 8px; /* Slightly reduced */
-        padding: 1.25rem; /* Reduced padding */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem; /* Reduced margin */
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: none;
     }
+    
+    .dashboard-card:hover {
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        transform: translateY(-5px);
+    }
+    
+    .dashboard-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #25a244, #82ca9c);
+        transform: scaleX(0);
+        transition: transform 0.5s ease;
+        transform-origin: left;
+    }
+    
+    .dashboard-card:hover::after {
+        transform: scaleX(1);
+    }
+    
     .dashboard-card h2 {
-        font-size: 1.35rem; /* Reduced heading size */
-        margin-bottom: 1rem; /* Reduced margin */
+        font-size: 1.35rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        color: #333;
     }
+    
+    .dashboard-card h2 i {
+        margin-right: 0.75rem;
+    }
+    
+    /* Investment Card Design */
     .investment-card {
         background: white;
-        border-radius: 8px; /* Slightly reduced */
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.2s ease; /* Slightly faster */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        border: none;
     }
+    
     .investment-card:hover {
-        transform: translateY(-3px); /* Reduced movement */
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     }
+    
     .investment-image {
-        height: 120px; /* Reduced height */
+        height: 160px;
         object-fit: cover;
         width: 100%;
+        transition: transform 0.5s ease;
     }
+    
+    .investment-card:hover .investment-image {
+        transform: scale(1.05);
+    }
+    
     .investment-content {
-        padding: 1rem; /* Reduced padding */
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
     }
+    
     .investment-title {
-        font-size: 1.1rem; /* Reduced font size */
+        font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 0.25rem; /* Reduced margin */
-        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        color: #333;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    
     .investment-amount {
-        font-size: 1.25rem; /* Reduced font size */
+        font-size: 1.25rem;
         font-weight: 600;
-        color: #28a745;
-        margin-bottom: 0.5rem; /* Reduced margin */
+        color: #25a244;
+        margin-bottom: 0.75rem;
     }
+    
     .impact-stats {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem; /* Reduced margin */
-        font-size: 0.8rem; /* Reduced font size */
-        color: #6c757d;
+        margin-bottom: 0.75rem;
+        font-size: 0.85rem;
+        color: #666;
     }
+    
     .impact-stat {
         display: flex;
         align-items: center;
-        gap: 0.25rem; /* Reduced gap */
+        gap: 0.35rem;
+        transition: all 0.3s ease;
     }
+    
+    .investment-card:hover .impact-stat {
+        transform: scale(1.05);
+    }
+    
     .impact-stat i {
-        color: #28a745;
-        font-size: 0.8rem; /* Reduced icon size */
+        color: #25a244;
+        font-size: 0.85rem;
     }
-    .chart-container {
-        height: 250px; /* Reduced height */
-        margin-bottom: 0.5rem; /* Reduced margin */
-    }
-    .table th {
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 0.9rem; /* Reduced font size */
-        padding: 0.5rem; /* Reduced padding */
-    }
-    .table td {
-        vertical-align: middle;
-        font-size: 0.9rem; /* Reduced font size */
-        padding: 0.5rem; /* Reduced padding */
-    }
+    
+    /* AI Insight Cards */
     .ai-insight-card {
         border-left: 4px solid;
-        padding: 0.75rem; /* Reduced padding */
-        margin-bottom: 0.75rem; /* Reduced margin */
+        padding: 1rem;
+        margin-bottom: 1rem;
         background: #f8f9fa;
-        border-radius: 0 8px 8px 0;
-        font-size: 0.9rem; /* Reduced font size */
+        border-radius: 0 12px 12px 0;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .ai-insight-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 100%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+    
+    .ai-insight-card:hover::before {
+        transform: translateX(100%);
+    }
+    
+    .ai-insight-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
+    }
+    
     .ai-insight-card.high {
         border-left-color: #dc3545;
     }
+    
     .ai-insight-card.medium {
         border-left-color: #ffc107;
     }
+    
     .ai-insight-card.low {
         border-left-color: #28a745;
     }
+    
     .ai-insight-card i {
-        margin-right: 0.5rem;
+        margin-right: 0.75rem;
     }
-    /* New styles for better readability and compactness */
-    .row.g-4 {
-        --bs-gutter-x: 0.75rem; /* Reduced gutter */
+    
+    /* Chart Styling */
+    .chart-container {
+        height: 280px;
+        margin-bottom: 1rem;
+        position: relative;
     }
+    
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+        padding: 0.75rem;
+        border-top: none;
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+    
+    .table td {
+        vertical-align: middle;
+        font-size: 0.9rem;
+        padding: 0.75rem;
+        border-color: rgba(0,0,0,0.03);
+    }
+    
+    /* Badge Styling */
     .badge {
-        font-size: 0.7rem;
-        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        font-weight: 500;
+        display: inline-block;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
+    
+    .badge-success {
+        background: linear-gradient(90deg, #25a244, #82ca9c);
+        border: none;
+    }
+    
+    /* Button Styling */
     .btn-sm {
-        padding: 0.25rem 0.5rem;
+        padding: 0.35rem 0.75rem;
         font-size: 0.8rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
-    .text-muted.small {
-        font-size: 0.8rem;
+    
+    .btn-outline-success {
+        color: #25a244;
+        border-color: #25a244;
+    }
+    
+    .btn-outline-success:hover {
+        background-color: #25a244;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 162, 68, 0.15);
+    }
+    
+    /* Animated elements */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive adjustments */
+    .row.g-4 {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 1.5rem;
+    }
+    
+    @media (max-width: 991px) {
+        .hero {
+            padding: 2rem 0;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+        }
+        
+        .stat-card i {
+            font-size: 1.5rem;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section (More Compact) -->
+<!-- Hero Section -->
 <div class="hero">
     <div class="container">
-        <div class="row g-2"> <!-- Reduced gutter -->
+        <div class="row g-3">
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.1s;">
                     <i class="fas fa-wallet"></i>
                     <h3>₹{{ total_invested|intcomma }}</h3>
                     <p>Total Invested</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.2s;">
                     <i class="fas fa-cloud"></i>
                     <h3>{{ total_impact.carbon|intcomma }}</h3>
-                    <p>CO₂ Reduced</p>
+                    <p>CO₂ Reduced (kg)</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.3s;">
                     <i class="fas fa-bolt"></i>
                     <h3>{{ total_impact.energy|intcomma }}</h3>
-                    <p>Energy Saved</p>
+                    <p>Energy Saved (kWh)</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.4s;">
                     <i class="fas fa-tint"></i>
                     <h3>{{ total_impact.water|intcomma }}</h3>
-                    <p>Water Conserved</p>
+                    <p>Water Conserved (L)</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="container">
+
+<div class="container mt-4">
     <!-- Two-column layout for better screen utilization -->
     <div class="row">
         <!-- Left column: AI Insights and Investment Distribution -->
         <div class="col-md-4">
             <!-- AI Portfolio Insights -->
-            <div class="dashboard-card">
+            <div class="dashboard-card fade-in-up" style="animation-delay: 0.2s;">
                 <h2><i class="fas fa-robot text-primary"></i> Portfolio Insights</h2>
                 {% if portfolio_recommendations %}
                     {% for rec in portfolio_recommendations %}
@@ -206,8 +418,8 @@
             </div>
             
             <!-- Investment Distribution (Charts) -->
-            <div class="dashboard-card">
-                <h2>Investment Distribution</h2>
+            <div class="dashboard-card fade-in-up" style="animation-delay: 0.3s;">
+                <h2><i class="fas fa-chart-pie text-info"></i> Investment Distribution</h2>
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
                 </div>
@@ -216,11 +428,11 @@
                 </div>
             </div>
 
-            <!-- Impact by Category - More compact table -->
-            <div class="dashboard-card">
-                <h2>Impact by Category</h2>
+            <!-- Impact by Category -->
+            <div class="dashboard-card fade-in-up" style="animation-delay: 0.4s;">
+                <h2><i class="fas fa-leaf text-success"></i> Impact by Category</h2>
                 <div class="table-responsive">
-                    <table class="table table-sm">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>Category</th>
@@ -248,9 +460,9 @@
         <div class="col-md-8">
             <!-- Personalized Recommendations -->
             {% if user_preferences %}
-            <div class="dashboard-card">
+            <div class="dashboard-card fade-in-up" style="animation-delay: 0.2s;">
                 <h2><i class="fas fa-lightbulb text-warning"></i> Recommended for You</h2>
-                <div class="row g-3"> <!-- Smaller gutter -->
+                <div class="row g-3">
                     {% for initiative in recommended_initiatives %}
                     <div class="col-md-4">
                         <div class="investment-card">
@@ -260,31 +472,31 @@
                             <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" class="investment-image">
                             {% endif %}
                             <div class="investment-content">
-                                <div class="mb-1"> <!-- Reduced margin -->
+                                <div class="mb-2">
                                     {% for category in initiative.categories.all %}
-                                    <span class="badge bg-success">{{ category.name }}</span>
+                                    <span class="badge badge-success">{{ category.name }}</span>
                                     {% endfor %}
                                 </div>
                                 <h3 class="investment-title" title="{{ initiative.title }}">{{ initiative.title }}</h3>
                                 <div class="investment-amount">₹{{ initiative.min_investment|intcomma }} min.</div>
                                 
                                 <div class="impact-stats">
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Carbon Impact">
                                         <i class="fas fa-cloud"></i>
                                         {{ initiative.carbon_impact|floatformat:0|intcomma }}
                                     </div>
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Energy Impact">
                                         <i class="fas fa-bolt"></i>
                                         {{ initiative.energy_impact|floatformat:0|intcomma }}
                                     </div>
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Water Impact">
                                         <i class="fas fa-tint"></i>
                                         {{ initiative.water_impact|floatformat:0|intcomma }}
                                     </div>
                                 </div>
                                 
-                                <div class="mt-2"> <!-- Reduced margin -->
-                                    <div class="text-muted small mb-1">
+                                <div class="mt-auto pt-3">
+                                    <div class="text-muted small mb-2">
                                         <i class="fas fa-thumbs-up"></i> {{ initiative.match_score|floatformat:0 }}% match
                                     </div>
                                     <a href="{% url 'initiative_detail' initiative.id %}" class="btn btn-outline-success btn-sm w-100">
@@ -296,7 +508,7 @@
                     </div>
                     {% empty %}
                     <div class="col-12">
-                        <div class="alert alert-info py-2"> <!-- Reduced padding -->
+                        <div class="alert alert-info py-3">
                             <i class="fas fa-info-circle me-2"></i> We're finding initiatives that match your preferences. Check back soon!
                         </div>
                     </div>
@@ -306,9 +518,9 @@
             {% endif %}
 
             <!-- My Holdings -->
-            <div class="dashboard-card">
-                <h2>My Holdings</h2>
-                <div class="row g-3"> <!-- Smaller gutter -->
+            <div class="dashboard-card fade-in-up" style="animation-delay: 0.3s;">
+                <h2><i class="fas fa-folder-open text-secondary"></i> My Holdings</h2>
+                <div class="row g-3">
                     {% for investment_data in recent_investments %}
                     <div class="col-md-4">
                         <div class="investment-card">
@@ -322,21 +534,21 @@
                                 <div class="investment-amount">₹{{ investment_data.total_amount|intcomma }}</div>
                                 
                                 <div class="impact-stats">
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Carbon Impact">
                                         <i class="fas fa-cloud"></i>
                                         {{ investment_data.impact_metrics.carbon|floatformat:0|intcomma }}
                                     </div>
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Energy Impact">
                                         <i class="fas fa-bolt"></i>
                                         {{ investment_data.impact_metrics.energy|floatformat:0|intcomma }}
                                     </div>
-                                    <div class="impact-stat">
+                                    <div class="impact-stat" title="Water Impact">
                                         <i class="fas fa-tint"></i>
                                         {{ investment_data.impact_metrics.water|floatformat:0|intcomma }}
                                     </div>
                                 </div>
                                 
-                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
                                     <div class="text-muted small">
                                         <i class="fas fa-calendar"></i> {{ investment_data.last_investment_date|date:"M d, Y" }}
                                     </div>
@@ -348,8 +560,10 @@
                         </div>
                     </div>
                     {% empty %}
-                    <div class="col-12 text-center">
-                        <p class="text-muted">No investments yet.</p>
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">You haven't made any investments yet.</p>
+                        <a href="{% url 'initiative_list' %}" class="btn btn-success mt-2">Browse Projects</a>
                     </div>
                     {% endfor %}
                 </div>
@@ -362,7 +576,7 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Category Distribution Chart - More compact
+    // Category Distribution Chart
     const categoryCtx = document.getElementById('categoryChart').getContext('2d');
     new Chart(categoryCtx, {
         type: 'doughnut',
@@ -371,12 +585,15 @@
             datasets: [{
                 data: [{% for cat in category_distribution %}{{ cat.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
                 backgroundColor: [
-                    '#28a745',
-                    '#20c997',
-                    '#17a2b8',
-                    '#6c757d',
-                    '#ffc107'
-                ]
+                    '#25a244',
+                    '#82ca9c',
+                    '#3498db',
+                    '#9b59b6',
+                    '#f1c40f',
+                    '#e74c3c'
+                ],
+                borderWidth: 0,
+                hoverOffset: 15
             }]
         },
         options: {
@@ -386,9 +603,9 @@
                 legend: {
                     position: 'bottom',
                     labels: {
-                        boxWidth: 12,
+                        padding: 15,
                         font: {
-                            size: 10
+                            size: 11
                         }
                     }
                 },
@@ -396,15 +613,30 @@
                     display: true,
                     text: 'Category Distribution',
                     font: {
-                        size: 14
+                        size: 14,
+                        weight: 'normal'
+                    },
+                    padding: {
+                        bottom: 10
                     }
                 }
+            },
+            cutout: '65%',
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000,
+                easing: 'easeOutCirc'
             }
         }
     });
 
-    // Investment Trend Chart - More compact
+    // Investment Trend Chart
     const trendCtx = document.getElementById('trendChart').getContext('2d');
+    const gradientBg = trendCtx.createLinearGradient(0, 0, 0, 400);
+    gradientBg.addColorStop(0, 'rgba(37, 162, 68, 0.2)');
+    gradientBg.addColorStop(1, 'rgba(37, 162, 68, 0)');
+    
     new Chart(trendCtx, {
         type: 'line',
         data: {
@@ -412,8 +644,15 @@
             datasets: [{
                 label: 'Monthly Investments',
                 data: [{% for trend in monthly_trends %}{{ trend.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                borderColor: '#28a745',
-                tension: 0.1
+                borderColor: '#25a244',
+                backgroundColor: gradientBg,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#25a244',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
@@ -424,15 +663,25 @@
                     beginAtZero: true,
                     ticks: {
                         font: {
-                            size: 10
+                            size: 11
+                        },
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
                         }
+                    },
+                    grid: {
+                        drawBorder: false,
+                        color: '#f0f0f0'
                     }
                 },
                 x: {
                     ticks: {
                         font: {
-                            size: 10
+                            size: 11
                         }
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             },
@@ -444,9 +693,17 @@
                     display: true,
                     text: 'Investment Trends',
                     font: {
-                        size: 14
+                        size: 14,
+                        weight: 'normal'
+                    },
+                    padding: {
+                        bottom: 10
                     }
                 }
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeOutQuart'
             }
         }
     });

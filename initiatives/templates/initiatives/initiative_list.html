@@ -5,250 +5,401 @@
 
 {% block extra_css %}
 <style>
+    /* Modern Hero Section */
     .hero {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, #155d27 0%, #25a244 100%);
         color: white;
-        padding: 2.5rem 0;
-        margin-bottom: 1.5rem;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{% static 'images/pattern.svg' %}") repeat;
+        opacity: 0.06;
+        animation: patternFloat 60s linear infinite;
+    }
+    
+    @keyframes patternFloat {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-100%); }
+    }
+    
     .stat-card {
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: 16px;
+        padding: 1.2rem;
         text-align: center;
         backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        height: 100%;
     }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
     .stat-card i {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         margin-bottom: 0.5rem;
         opacity: 0.9;
     }
+    
     .stat-card h3 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         margin-bottom: 0.25rem;
+        font-weight: 600;
     }
+    
     .stat-card p {
         margin: 0;
         opacity: 0.9;
         font-size: 0.9rem;
     }
+    
+    /* Modern Filter Section */
     .filter-section {
         background: white;
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        margin-top: -1.5rem;
+        position: relative;
+        z-index: 10;
     }
+    
     .form-label {
         font-size: 0.9rem;
         margin-bottom: 0.25rem;
-    }
-    .form-select, .form-control {
-        font-size: 0.9rem;
-        padding: 0.375rem 0.5rem;
-    }
-    .btn {
-        font-size: 0.9rem;
-        padding: 0.375rem 0.75rem;
+        color: #555;
+        font-weight: 500;
     }
     
-    /* New simplified card design */
+    .form-select, .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .form-select:focus, .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(37, 162, 68, 0.1);
+        border-color: #25a244;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #25a244 0%, #82ca9c 100%);
+        border: none;
+        box-shadow: 0 5px 15px rgba(37, 162, 68, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 162, 68, 0.3);
+        background: linear-gradient(135deg, #1e8e37 0%, #6db985 100%);
+    }
+    
+    /* Modern Initiative Card Design */
     .initiative-card {
         background: white;
-        border-radius: 8px;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.2s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         height: 100%;
         display: flex;
         flex-direction: column;
         position: relative;
+        border: none;
     }
+    
     .initiative-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     }
+    
     .initiative-image {
-        height: 140px;
+        height: 180px;
         object-fit: cover;
         width: 100%;
+        transition: transform 0.5s ease;
     }
+    
+    .initiative-card:hover .initiative-image {
+        transform: scale(1.05);
+    }
+    
     .initiative-content {
-        padding: 1.25rem;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
+        position: relative;
     }
+    
     .initiative-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
     }
+    
     .initiative-title-area {
         flex: 1;
     }
+    
     .initiative-title {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 600;
-        margin-bottom: 0.25rem;
-        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        color: #333;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    
     .initiative-status {
-        margin-left: 0.5rem;
+        margin-left: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
+    
     .initiative-description {
-        color: #6c757d;
-        margin-bottom: 1rem;
+        color: #666;
+        margin-bottom: 1.25rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        font-size: 0.85rem;
-        line-height: 1.4;
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
+    
     .funding-info {
-        margin-bottom: 0.75rem;
+        margin-bottom: 1.25rem;
     }
+    
     .funding-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
         font-size: 0.9rem;
     }
+    
     .progress {
-        height: 6px;
+        height: 8px;
         margin-bottom: 0.5rem;
-        border-radius: 3px;
+        border-radius: 4px;
+        background-color: #f3f3f3;
+        overflow: hidden;
     }
+    
     .progress-bar {
-        border-radius: 3px;
+        background: linear-gradient(90deg, #25a244, #82ca9c);
+        border-radius: 4px;
+        transition: width 1.5s ease;
     }
+    
     .initiative-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.75rem;
         margin-top: auto;
+        margin-bottom: 1rem;
     }
+    
     .initiative-tag {
         font-size: 0.75rem;
-        padding: 0.15rem 0.5rem;
-        border-radius: 12px;
-        background: #f0f0f0;
-        color: #555;
+        padding: 0.25rem 0.75rem;
+        border-radius: 30px;
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        gap: 0.35rem;
+        transition: all 0.3s ease;
     }
+    
     .initiative-tag.location {
         background: #f5f5f5;
     }
+    
     .initiative-tag.investment {
         background: #e8f5e9;
         color: #2e7d32;
     }
+    
+    .initiative-card:hover .initiative-tag {
+        transform: translateY(-3px);
+    }
+    
     .btn-learn-more {
-        background: #28a745;
+        background: linear-gradient(135deg, #25a244 0%, #82ca9c 100%);
         color: white;
-        padding: 0.375rem 0.75rem;
-        border-radius: 5px;
+        padding: 0.75rem;
+        border-radius: 8px;
         text-decoration: none;
-        transition: background-color 0.3s ease;
-        font-size: 0.85rem;
-        margin-top: 1rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
         text-align: center;
         display: block;
+        font-weight: 500;
+        box-shadow: 0 5px 15px rgba(37, 162, 68, 0.15);
     }
+    
     .btn-learn-more:hover {
-        background: #218838;
+        background: linear-gradient(135deg, #1e8e37 0%, #6db985 100%);
         color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(37, 162, 68, 0.25);
     }
     
     /* Details toggle section */
     .details-toggle {
-        color: #28a745;
-        font-size: 0.8rem;
+        color: #25a244;
+        font-size: 0.85rem;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        margin-top: 0.5rem;
+        gap: 0.35rem;
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
         user-select: none;
+        transition: all 0.3s ease;
     }
+    
+    .details-toggle:hover {
+        color: #1e8e37;
+    }
+    
     .initiative-details {
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
     .initiative-details.show {
         max-height: 500px;
     }
+    
     .detail-section {
         margin-top: 0.75rem;
         padding-top: 0.75rem;
-        border-top: 1px solid #eee;
+        border-top: 1px solid rgba(0,0,0,0.05);
     }
+    
     .impact-stats {
         display: flex;
         justify-content: space-between;
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.75rem;
     }
+    
     .impact-stat {
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-    }
-    .impact-stat i {
-        color: #28a745;
-        font-size: 0.8rem;
+        gap: 0.35rem;
+        transition: all 0.3s ease;
     }
     
-    /* Other styles */
+    .initiative-card:hover .impact-stat {
+        transform: scale(1.05);
+    }
+    
+    .impact-stat i {
+        color: #25a244;
+        font-size: 0.85rem;
+    }
+    
+    /* Filter components */
     .row.g-3 {
         --bs-gutter-x: 1.5rem;
         --bs-gutter-y: 1.5rem;
     }
+    
     .filter-form-container {
-        transition: max-height 0.3s ease;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         max-height: 65px;
         overflow: hidden;
     }
+    
     .filter-form-container.expanded {
         max-height: 300px;
     }
+    
     .collapse-toggle {
         cursor: pointer;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 0.5rem 0;
+        color: #333;
+        font-weight: 500;
     }
+    
     .badge {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 30px;
+        font-weight: 500;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
+    
     .filter-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        align-items: center;
     }
+    
     .filter-chip {
-        background: #f0f0f0;
-        border-radius: 16px;
-        padding: 0.25rem 0.75rem;
-        font-size: 0.8rem;
+        background: #f8f9fa;
+        border-radius: 30px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.85rem;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
     }
+    
+    .filter-chip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
     .filter-chip i {
         cursor: pointer;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-chip i:hover {
+        opacity: 1;
+        transform: scale(1.2);
     }
     
     /* View toggle */
@@ -256,50 +407,145 @@
         display: flex;
         margin-bottom: 1rem;
     }
+    
     .view-toggle-btn {
-        padding: 0.25rem 0.75rem;
-        background: #f0f0f0;
+        padding: 0.35rem 0.9rem;
+        background: #f8f9fa;
         border: none;
         font-size: 0.85rem;
         cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
     }
+    
     .view-toggle-btn:first-child {
-        border-radius: 4px 0 0 4px;
+        border-radius: 8px 0 0 8px;
     }
+    
     .view-toggle-btn:last-child {
-        border-radius: 0 4px 4px 0;
+        border-radius: 0 8px 8px 0;
     }
+    
     .view-toggle-btn.active {
-        background: #28a745;
+        background: linear-gradient(135deg, #25a244 0%, #82ca9c 100%);
         color: white;
     }
+    
+    .view-toggle-btn:not(.active):hover {
+        background: #f0f0f0;
+    }
+    
+    /* Compact view adjustments */
     .compact-view .initiative-card {
         flex-direction: row;
         height: auto;
     }
+    
     .compact-view .initiative-image {
         width: 25%;
         height: auto;
+        min-height: 100%;
     }
+    
     .compact-view .initiative-content {
         width: 75%;
     }
+    
     .compact-view .initiative-description {
         -webkit-line-clamp: 1;
     }
     
     /* Pagination styling */
     .pagination {
-        margin-top: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
     }
+    
     .page-link {
-        color: #28a745;
-        padding: 0.375rem 0.75rem;
+        color: #25a244;
+        padding: 0.5rem 0.75rem;
         font-size: 0.9rem;
+        border-radius: 8px;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
     }
+    
     .page-item.active .page-link {
-        background-color: #28a745;
-        border-color: #28a745;
+        background-color: #25a244;
+        border-color: #25a244;
+        box-shadow: 0 5px 15px rgba(37, 162, 68, 0.15);
+    }
+    
+    .page-link:hover:not(.active) {
+        background-color: #e8f5e9;
+        color: #1e8e37;
+        transform: translateY(-2px);
+    }
+    
+    /* Animated elements */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+        .hero {
+            padding: 2rem 0;
+        }
+        
+        .filter-section {
+            margin-top: -1rem;
+            padding: 1.25rem;
+        }
+        
+        .initiative-image {
+            height: 160px;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .compact-view .initiative-card {
+            flex-direction: column;
+        }
+        
+        .compact-view .initiative-image {
+            width: 100%;
+            height: 140px;
+        }
+        
+        .compact-view .initiative-content {
+            width: 100%;
+        }
+        
+        .initiative-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .initiative-tag {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
@@ -308,30 +554,30 @@
 <!-- Hero Section -->
 <div class="hero">
     <div class="container">
-        <div class="row g-2">
+        <div class="row g-3">
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.1s;">
                     <i class="fas fa-project-diagram"></i>
                     <h3>{{ total_initiatives|intcomma }}</h3>
                     <p>Active Projects</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.2s;">
                     <i class="fas fa-users"></i>
                     <h3>{{ total_investors|intcomma }}</h3>
                     <p>Total Investors</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.3s;">
                     <i class="fas fa-rupee-sign"></i>
                     <h3>₹{{ total_invested|intcomma }}</h3>
                     <p>Total Invested</p>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
+                <div class="stat-card fade-in" style="animation-delay: 0.4s;">
                     <i class="fas fa-cloud"></i>
                     <h3>{{ total_carbon|intcomma }}</h3>
                     <p>CO₂ Reduced</p>
@@ -343,7 +589,7 @@
 
 <div class="container">
     <!-- Filter Section -->
-    <div class="filter-section">
+    <div class="filter-section fade-in-up" style="animation-delay: 0.3s;">
         <!-- Active Filters Row -->
         {% if request.GET.category or request.GET.status or request.GET.sort or request.GET.search %}
         <div class="filter-row">
@@ -386,7 +632,7 @@
         
         <!-- Filter Form (Collapsible) -->
         <div class="filter-form-container" id="filterForm">
-            <form method="get" class="row g-2">
+            <form method="get" class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Category</label>
                     <select name="category" class="form-select">
@@ -447,7 +693,7 @@
     <div class="row g-3" id="initiatives-container">
         {% for initiative in initiatives %}
         <div class="col-lg-4 col-md-6">
-            <div class="initiative-card">
+            <div class="initiative-card fade-in-up" style="animation-delay: {{ forloop.counter|add:'2' }}00ms;">
                 {% if initiative.image %}
                 <img src="{{ initiative.image.url }}" alt="{{ initiative.title }}" class="initiative-image">
                 {% else %}
@@ -462,7 +708,7 @@
                                 <span class="badge bg-success">{{ category.name }}</span>
                                 {% endfor %}
                                 {% if initiative.categories.all|length > 1 %}
-                                <span class="badge bg-secondary ms-1">+{{ initiative.categories.all|length|add:"-1" }}</span>
+                                <span class="badge bg-light text-dark ms-1">+{{ initiative.categories.all|length|add:"-1" }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -498,10 +744,12 @@
                             Min: ₹{{ initiative.min_investment|intcomma }}
                         </div>
                         
+                        {% if initiative.location %}
                         <div class="initiative-tag location">
                             <i class="fas fa-map-marker-alt"></i>
                             {{ initiative.location }}
                         </div>
+                        {% endif %}
                     </div>
                     
                     <div class="details-toggle" data-initiative="{{ initiative.pk }}">
@@ -551,10 +799,10 @@
         </div>
         {% empty %}
         <div class="col-12 text-center">
-            <div class="p-4 bg-light rounded">
-                <i class="fas fa-search fa-2x text-muted mb-2"></i>
-                <p class="text-muted">No initiatives found matching your criteria.</p>
-                <a href="?" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+            <div class="p-5 bg-light rounded">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-3">No initiatives found matching your criteria.</p>
+                <a href="?" class="btn btn-outline-success">Clear filters</a>
             </div>
         </div>
         {% endfor %}
@@ -562,8 +810,8 @@
 
     <!-- Pagination -->
     {% if initiatives.has_other_pages %}
-    <nav aria-label="Page navigation" class="mt-3">
-        <ul class="pagination pagination-sm justify-content-center">
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
             {% if initiatives.has_previous %}
             <li class="page-item">
                 <a class="page-link" href="?page={{ initiatives.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
