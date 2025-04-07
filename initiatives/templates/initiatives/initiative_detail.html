@@ -6,29 +6,50 @@
 {% block extra_css %}
 <style>
 .hero {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #155d27 0%, #25a244 100%);
     color: white;
-    padding: 4rem 0;
-    margin-bottom: 2rem;
+    padding: 3rem 0 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("{% static 'images/pattern.svg' %}") repeat;
+    opacity: 0.06;
+    animation: patternFloat 60s linear infinite;
+}
+@keyframes patternFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
 }
 .initiative-image {
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     max-height: 400px;
     object-fit: cover;
     width: 100%;
+    transition: transform 0.4s ease;
+}
+.initiative-image:hover {
+    transform: scale(1.02);
 }
 .impact-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 16px;
     padding: 1.5rem;
     height: 100%;
     border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
 }
 .impact-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
 }
 .impact-icon {
     font-size: 2rem;
@@ -60,10 +81,15 @@
 }
 .detail-section {
     background: white;
-    border-radius: 10px;
+    border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+.detail-section:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transform: translateY(-5px);
 }
 .investor-avatar {
     width: 40px;
@@ -125,6 +151,40 @@
     border-radius: 50%;
     margin-right: 1rem;
 }
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.2rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+}
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 {% endblock %}
 
@@ -133,7 +193,7 @@
 <section class="hero">
     <div class="content-wrapper">
         <div class="row align-items-center">
-            <div class="col-lg-8">
+            <div class="col-lg-8 fade-in" style="animation-delay: 0.1s;">
                 <div class="mb-3">
                     {% for category in initiative.categories.all %}
                         <span class="badge bg-light text-dark me-2">{{ category.name }}</span>
@@ -147,26 +207,24 @@
                     <span>Started {{ initiative.created_at|date:"F d, Y" }}</span>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="card bg-white bg-opacity-10 border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-white">Progress</span>
-                            <span class="text-white">{{ initiative.get_progress_percentage|floatformat:1 }}%</span>
-                        </div>
-                        <div class="progress bg-white bg-opacity-25 mb-3">
-                            <div class="progress-bar bg-white" role="progressbar" 
-                                 style="width: {{ initiative.get_progress_percentage }}%"></div>
-                        </div>
-                        <div class="d-flex justify-content-between text-white-50 mb-4">
-                            <span>Raised: ₹{{ initiative.current_amount|floatformat:2|intcomma }}</span>
-                            <span>Goal: ₹{{ initiative.goal_amount|floatformat:2|intcomma }}</span>
-                        </div>
-                        <div class="d-grid">
-                            <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-light btn-lg">
-                                Invest Now
-                            </a>
-                        </div>
+            <div class="col-lg-4 fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Progress</span>
+                        <span>{{ initiative.get_progress_percentage|floatformat:1 }}%</span>
+                    </div>
+                    <div class="progress bg-white bg-opacity-25 mb-3" style="height: 10px; border-radius: 5px;">
+                        <div class="progress-bar bg-white" role="progressbar" 
+                             style="width: {{ initiative.get_progress_percentage }}%; border-radius: 5px;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between text-white-50 mb-4">
+                        <span>₹{{ initiative.current_amount|floatformat:2|intcomma }}</span>
+                        <span>₹{{ initiative.goal_amount|floatformat:2|intcomma }}</span>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'invest_initiative' initiative.id %}" class="btn btn-light btn-lg">
+                            Invest Now
+                        </a>
                     </div>
                 </div>
             </div>
@@ -174,7 +232,7 @@
     </div>
 </section>
 
-<div class="content-wrapper">
+<div class="content-wrapper mt-4">
     <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">
