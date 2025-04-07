@@ -77,7 +77,14 @@ class Investment(models.Model):
         
         # Update initiative amount if new investment
         if not self.pk:
-            self.initiative.current_amount += self.amount
+            # Calculate the new total amount after this investment
+            new_total_amount = self.initiative.current_amount + self.amount
+            self.initiative.current_amount = new_total_amount
+            
+            # Check if initiative is now fully funded (100% or more)
+            if new_total_amount >= self.initiative.goal_amount and self.initiative.status != 'funded':
+                self.initiative.status = 'funded'
+                
             self.initiative.save()
             
         super().save(*args, **kwargs)

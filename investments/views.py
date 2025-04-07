@@ -14,6 +14,11 @@ from django.http import JsonResponse
 def invest_initiative(request, pk):
     initiative = get_object_or_404(Initiative, pk=pk)
     
+    # Check if initiative is already fully funded
+    if initiative.status == 'funded':
+        messages.error(request, f'This initiative is already fully funded. No further investments are being accepted.')
+        return redirect('initiative_detail', pk=initiative.pk)
+    
     if request.method == 'POST':
         amount_str = request.POST.get('amount', '')
         print(f"Original amount string: '{amount_str}'")
@@ -27,6 +32,13 @@ def invest_initiative(request, pk):
                 # Convert to Decimal for precise financial calculations
                 amount = Decimal(amount_str)
                 print(f"Converted to Decimal: {amount}")
+                
+                # Check if accepting this investment would exceed goal amount
+                remaining_amount = initiative.goal_amount - initiative.current_amount
+                if amount > remaining_amount and remaining_amount > 0:
+                    messages.warning(request, f'This initiative only needs ₹{remaining_amount:,} more to be fully funded. Would you like to invest this amount instead?')
+                    # Adjust the amount to match the remaining needed amount
+                    amount = remaining_amount
                 
                 if amount < initiative.min_investment:
                     messages.error(request, f'Minimum investment amount is ₹{initiative.min_investment:,}')
@@ -59,6 +71,10 @@ def invest_initiative(request, pk):
                         
                         # Add success message
                         messages.success(request, f'Successfully invested ₹{amount:,} in {initiative.title}')
+                        
+                        # If the initiative is now fully funded, add a special message
+                        if initiative.status == 'funded':
+                            messages.success(request, f'Congratulations! Your investment has fully funded this initiative!')
                         
                         # Redirect to user's dashboard to see their holdings
                         return redirect('dashboard')

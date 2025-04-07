@@ -98,6 +98,11 @@
             <div class="col-lg-8">
                 <h1 class="display-4 fw-bold mb-4">Invest in {{ initiative.title }}</h1>
                 <p class="lead text-white-50">Join us in making a sustainable impact through this innovative green initiative.</p>
+                {% if initiative.status == 'funded' %}
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i> This initiative has been fully funded!
+                </div>
+                {% endif %}
             </div>
             <div class="col-lg-4">
                 <div class="card bg-white bg-opacity-10 border-0">
@@ -127,14 +132,20 @@
         <div class="col-lg-8">
             <div class="investment-form">
                 <h3 class="mb-4">Investment Details</h3>
-                <form method="post" id="investmentForm">
+                {% if initiative.status == 'funded' %}
+                <div class="alert alert-info mb-4">
+                    <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i> Funding Complete</h5>
+                    <p class="mb-0">This initiative has reached 100% of its goal amount and is no longer accepting investments. Thank you for your interest!</p>
+                </div>
+                {% endif %}
+                <form method="post" id="investmentForm" {% if initiative.status == 'funded' %}class="opacity-50"{% endif %}>
                     {% csrf_token %}
                     <div class="mb-4">
                         <label for="amount" class="form-label">Investment Amount (₹)</label>
                         <div class="input-group">
                             <span class="input-group-text">₹</span>
                             <input type="text" class="form-control form-control-lg" id="amount" name="amount" 
-                                   required
+                                   required {% if initiative.status == 'funded' %}disabled{% endif %}
                                    placeholder="Enter amount (minimum ₹{{ min_investment|intcomma }})">
                         </div>
                         <div class="form-text">Minimum investment: ₹{{ min_investment|intcomma }}{% if max_investment %}, Maximum: ₹{{ max_investment|intcomma }}{% endif %}</div>
@@ -188,8 +199,8 @@
                     </div>
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-success btn-invest">
-                            Confirm Investment
+                        <button type="submit" class="btn btn-success btn-invest" {% if initiative.status == 'funded' %}disabled{% endif %}>
+                            {% if initiative.status == 'funded' %}Fully Funded{% else %}Confirm Investment{% endif %}
                         </button>
                     </div>
                 </form>
